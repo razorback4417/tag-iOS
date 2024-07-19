@@ -26,11 +26,13 @@ struct MainTabView: View {
                     Text("Trips")
                 }
             
-            Text("Settings")
-                .tabItem {
-                    Image(systemName: "gear")
-                    Text("Settings")
-                }
+            NavigationView {
+                SettingsView()
+            }
+            .tabItem {
+                Image(systemName: "gear")
+                Text("Settings")
+            }
         }
         .accentColor(Color(red: 0.25, green: 0.55, blue: 0.15))
         .fullScreenCover(isPresented: $showCreateView) {
@@ -44,4 +46,3 @@ struct MainTabView_Previews: PreviewProvider {
         MainTabView()
     }
 }
-
