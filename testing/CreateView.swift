@@ -11,6 +11,8 @@ struct CreateView: View {
     @Binding var isPresented: Bool
     @State private var currentStep = 1
     
+    var onViewMyTrip: () -> Void
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -41,7 +43,7 @@ struct CreateView: View {
                     case 4:
                         Step4View(currentStep: $currentStep)
                     case 5:
-                        Step5View(currentStep: $currentStep)
+                        Step5View(currentStep: $currentStep, onViewMyTrip: onViewMyTrip)
                     default:
                         EmptyView()
                     }
@@ -402,6 +404,7 @@ struct TripDetailRow: View {
 
 struct Step5View: View {
     @Binding var currentStep: Int
+    var onViewMyTrip: () -> Void
     
     var body: some View {
         VStack(spacing: 20) {
@@ -425,7 +428,8 @@ struct Step5View: View {
             Spacer()
             
             Button(action: {
-                // Action for viewing the trip
+                print("Navigating to My Trips")
+                onViewMyTrip()
             }) {
                 Text("View my Trip")
                     .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
@@ -441,10 +445,8 @@ struct Step5View: View {
     }
 }
 
-
-
 struct CreateView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateView(isPresented: .constant(true))
+        CreateView(isPresented: .constant(true), onViewMyTrip: {})
     }
 }
