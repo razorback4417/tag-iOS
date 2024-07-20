@@ -103,7 +103,7 @@ struct Step1View: View {
                 currentStep += 1
             }) {
                 Text("Next")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 53)
@@ -173,7 +173,7 @@ struct Step2View: View {
                     .foregroundColor(.black)
                 
                 Text("Select your pickup and drop-off location")
-                    .font(.custom("Be Vietnam Pro", size: 12))
+                    .font(.custom("BeVietnamPro-Regular", size: 12))
                     .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
             }
             .padding(.top, 20) // Add more spacing at the top
@@ -184,7 +184,7 @@ struct Step2View: View {
                     Image(systemName: "paperplane")
                         .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                     TextField("Pickup location", text: $pickupLocation)
-                        .font(.custom("Be Vietnam Pro", size: 14))
+                        .font(.custom("BeVietnamPro-Regular", size: 14))
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
@@ -195,7 +195,7 @@ struct Step2View: View {
                     Image(systemName: "mappin.and.ellipse")
                         .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                     TextField("Destination", text: $destination)
-                        .font(.custom("Be Vietnam Pro", size: 14))
+                        .font(.custom("BeVietnamPro-Regular", size: 14))
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
@@ -225,7 +225,7 @@ struct Step2View: View {
                 currentStep += 1
             }) {
                 Text("Next")
-                    .font(.custom("Be Vietnam Pro", size: 15).weight(.bold))
+                    .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 53)
@@ -235,12 +235,6 @@ struct Step2View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 20)
         }
-    }
-}
-
-struct Step2View_Previews: PreviewProvider {
-    static var previews: some View {
-        Step2View(currentStep: .constant(2))
     }
 }
 
@@ -319,7 +313,7 @@ struct Step3View: View {
                 currentStep += 1
             }) {
                 Text("Next")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 53)
@@ -369,7 +363,7 @@ struct Step4View: View {
                 currentStep += 1
             }) {
                 Text("Post trip")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 53)
@@ -434,7 +428,7 @@ struct Step5View: View {
                 // Action for viewing the trip
             }) {
                 Text("View my Trip")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 53)

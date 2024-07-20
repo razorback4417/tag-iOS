@@ -22,12 +22,12 @@
 		<string>BeVietnamPro-SemiBoldItalic.ttf</string>
 		<string>BeVietnamPro-Thin.ttf</string>
 		<string>BeVietnamPro-ThinItalic.ttf</string>
-		<string>Manrope-Bold</string>
-		<string>Manrope-ExtraBold</string>
-		<string>Manrope-ExtraLight</string>
-		<string>Manrope-Light</string>
-		<string>Manrope-Medium</string>
-		<string>Manrope-Regular</string>
+		<string>Manrope-Bold.ttf</string>
+		<string>Manrope-ExtraBold.ttf</string>
+		<string>Manrope-ExtraLight.ttf</string>
+		<string>Manrope-Light.ttf</string>
+		<string>Manrope-Medium.ttf</string>
+		<string>Manrope-Regular.ttf</string>
 		<string></string>
 	</array>
 	<key>UTImportedTypeDeclarations</key>

@@ -20,9 +20,7 @@ struct MainTabView: View {
                 Text("Home")
             }
             
-            NavigationView {
-                SearchView()
-            }
+            SearchView()
             .tabItem {
                     Image(systemName: "map")
                     Text("Trips")
