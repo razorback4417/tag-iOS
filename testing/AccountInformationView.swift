@@ -65,7 +65,7 @@ struct AccountInformationView: View {
                     Text("General Info")
                         .font(.system(size: 18, weight: .bold))
                     
-                    ForEach(["School", "Major", "Hobbies"], id: \.self) { item in
+                    ForEach(["School", "Major", "Interests"], id: \.self) { item in
                         HStack {
                             Image(systemName: item == "School" ? "building.columns" : (item == "Major" ? "book" : "star"))
                                 .foregroundColor(.white)
