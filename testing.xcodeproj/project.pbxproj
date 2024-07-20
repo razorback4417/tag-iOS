@@ -10,6 +10,8 @@
 		54172D722C4BA22600198E7D /* MyTripsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54172D712C4BA22600198E7D /* MyTripsView.swift */; };
 		54172D742C4BB3BF00198E7D /* AccountInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54172D732C4BB3BF00198E7D /* AccountInformationView.swift */; };
 		54172D762C4BB6B300198E7D /* ActiveTripsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54172D752C4BB6B300198E7D /* ActiveTripsView.swift */; };
+		54172D782C4BC04D00198E7D /* TripDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54172D772C4BC04D00198E7D /* TripDetailsView.swift */; };
+		54172D7A2C4BC09B00198E7D /* TripInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54172D792C4BC09B00198E7D /* TripInfo.swift */; };
 		548997032C41CD7800F8EE66 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548997022C41CD7800F8EE66 /* LoginView.swift */; };
 		548997602C42678D00F8EE66 /* BeVietnamPro-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5489974E2C42678D00F8EE66 /* BeVietnamPro-Light.ttf */; };
 		548997612C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5489974F2C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf */; };
@@ -71,6 +73,8 @@
 		54172D712C4BA22600198E7D /* MyTripsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTripsView.swift; sourceTree = "<group>"; };
 		54172D732C4BB3BF00198E7D /* AccountInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountInformationView.swift; sourceTree = "<group>"; };
 		54172D752C4BB6B300198E7D /* ActiveTripsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveTripsView.swift; sourceTree = "<group>"; };
+		54172D772C4BC04D00198E7D /* TripDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailsView.swift; sourceTree = "<group>"; };
+		54172D792C4BC09B00198E7D /* TripInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripInfo.swift; sourceTree = "<group>"; };
 		548997022C41CD7800F8EE66 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		5489974E2C42678D00F8EE66 /* BeVietnamPro-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BeVietnamPro-Light.ttf"; sourceTree = "<group>"; };
 		5489974F2C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BeVietnamPro-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
@@ -224,6 +228,8 @@
 				54172D712C4BA22600198E7D /* MyTripsView.swift */,
 				54172D732C4BB3BF00198E7D /* AccountInformationView.swift */,
 				54172D752C4BB6B300198E7D /* ActiveTripsView.swift */,
+				54172D772C4BC04D00198E7D /* TripDetailsView.swift */,
+				54172D792C4BC09B00198E7D /* TripInfo.swift */,
 			);
 			path = testing;
 			sourceTree = "<group>";
@@ -415,7 +421,9 @@
 				54172D762C4BB6B300198E7D /* ActiveTripsView.swift in Sources */,
 				54B78FF02C2E242000CEEFED /* testingApp.swift in Sources */,
 				548997912C4B07F300F8EE66 /* SearchView.swift in Sources */,
+				54172D7A2C4BC09B00198E7D /* TripInfo.swift in Sources */,
 				548997872C42860B00F8EE66 /* HomeView.swift in Sources */,
+				54172D782C4BC04D00198E7D /* TripDetailsView.swift in Sources */,
 				54172D722C4BA22600198E7D /* MyTripsView.swift in Sources */,
 				5489978D2C49819A00F8EE66 /* CreateView.swift in Sources */,
 				548997832C42856000F8EE66 /* MainTabView.swift in Sources */,
