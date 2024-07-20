@@ -104,22 +104,40 @@ struct SettingsView_Previews: PreviewProvider {
 
 struct AccountInformationView: View {
     @Environment(\.presentationMode) var presentationMode
+    
+    let darkGreenColor = Color(red: 0.06, green: 0.36, blue: 0.22)
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     HStack(spacing: 16) {
-                        Image("profile_placeholder") // Replace with actual image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 140, height: 140)
-                            .clipShape(Circle())
-                            .overlay(
-                                Image(systemName: "pencil.circle.fill")
-                                    .foregroundColor(.green)
-                                    .offset(x: 50, y: 50)
-                            )
+                        AsyncImage(url: URL(string: "https://images.pexels.com/photos/6273480/pexels-photo-6273480.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 120, height: 120)
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Image(systemName: "pencil.circle.fill")
+                                            .foregroundColor(.green)
+                                            .offset(x: 50, y: 50)
+                                    )
+                            case .failure(_):
+                                Image(systemName: "person.circle.fill")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 120, height: 120)
+                                    .foregroundColor(.gray)
+                            case .empty:
+                                ProgressView()
+                                    .frame(width: 120, height: 120)
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
                         
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Mayu Yamaguchi")
@@ -145,7 +163,10 @@ struct AccountInformationView: View {
                     ForEach(["School", "Major", "Hobbies"], id: \.self) { item in
                         HStack {
                             Image(systemName: item == "School" ? "building.columns" : (item == "Major" ? "book" : "star"))
-                                .foregroundColor(.green)
+                                .foregroundColor(.white)
+                                .frame(width: 30, height: 30)
+                                .background(darkGreenColor)
+                                .clipShape(Circle())
                             Text(item)
                             Spacer()
                             Image(systemName: "chevron.right")
@@ -170,3 +191,9 @@ struct AccountInformationView: View {
     }
 }
 
+
+struct Account_Preview: PreviewProvider {
+    static var previews: some View {
+        AccountInformationView()
+    }
+}
