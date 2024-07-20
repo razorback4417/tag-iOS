@@ -9,6 +9,7 @@ import SwiftUI
 struct HomeView: View {
     @State private var searchText = ""
     @Binding var showCreateView: Bool
+    var onFindRidesTapped: () -> Void
     
     let imageURL = URL(string: "https://images.pexels.com/photos/6273480/pexels-photo-6273480.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")!
     
@@ -23,7 +24,7 @@ struct HomeView: View {
                 
                 // Find a Tag anywhere
                 SectionView(title: "Find a Tag anywhere", items: [
-                    SectionItem(imageURL: imageURL, title: "Find rides", description: "Split ride costs with verified students"),
+                    SectionItem(imageURL: imageURL, title: "Find rides", description: "Split ride costs with verified students", action: onFindRidesTapped),
                     SectionItem(imageURL: imageURL, title: "Create trip", description: "Create a new trip for others to join", action: { showCreateView = true })
                 ])
                 
@@ -175,6 +176,6 @@ struct JoinFriendView: View {
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView(showCreateView: .constant(false))
+        HomeView(showCreateView: .constant(false), onFindRidesTapped: {})
     }
 }

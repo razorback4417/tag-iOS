@@ -18,10 +18,14 @@ struct MainTabView: View {
     @State private var selectedTab = 0
     @State private var navigateToMyTrips = false
     
+    @State private var navigateToSearchView = false
+    
     var body: some View {
         TabView(selection: $selectedTab) {
-            NavigationView {
-                HomeView(showCreateView: $showCreateView)
+            NavigationStack {
+                HomeView(showCreateView: $showCreateView, onFindRidesTapped: {
+                    selectedTab = 1
+                })
             }
             .tabItem {
                 Image(systemName: "house")
