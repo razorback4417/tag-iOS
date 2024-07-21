@@ -19,6 +19,8 @@
 		54172D852C4C45F000198E7D /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 54172D842C4C45F000198E7D /* FirebaseFirestoreSwift */; };
 		54172D872C4C45F000198E7D /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 54172D862C4C45F000198E7D /* FirebaseStorage */; };
 		54172D892C4C463400198E7D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 54172D882C4C463400198E7D /* GoogleService-Info.plist */; };
+		54172D8B2C4C481B00198E7D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54172D8A2C4C481B00198E7D /* AppDelegate.swift */; };
+		54172D8E2C4C79E100198E7D /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54172D8D2C4C79E100198E7D /* UserViewModel.swift */; };
 		548997032C41CD7800F8EE66 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548997022C41CD7800F8EE66 /* LoginView.swift */; };
 		548997602C42678D00F8EE66 /* BeVietnamPro-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5489974E2C42678D00F8EE66 /* BeVietnamPro-Light.ttf */; };
 		548997612C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5489974F2C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf */; };
@@ -83,6 +85,8 @@
 		54172D772C4BC04D00198E7D /* TripDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailsView.swift; sourceTree = "<group>"; };
 		54172D792C4BC09B00198E7D /* TripInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripInfo.swift; sourceTree = "<group>"; };
 		54172D882C4C463400198E7D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		54172D8A2C4C481B00198E7D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		54172D8D2C4C79E100198E7D /* UserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewModel.swift; sourceTree = "<group>"; };
 		548997022C41CD7800F8EE66 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		5489974E2C42678D00F8EE66 /* BeVietnamPro-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BeVietnamPro-Light.ttf"; sourceTree = "<group>"; };
 		5489974F2C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BeVietnamPro-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
@@ -232,8 +236,8 @@
 				5489974D2C42675800F8EE66 /* Font */,
 				54B78FEF2C2E242000CEEFED /* testingApp.swift */,
 				54B78FF12C2E242000CEEFED /* ContentView.swift */,
-				548997022C41CD7800F8EE66 /* LoginView.swift */,
 				548997852C42859A00F8EE66 /* HomeView.swift */,
+				548997022C41CD7800F8EE66 /* LoginView.swift */,
 				54B78FF32C2E242200CEEFED /* Assets.xcassets */,
 				54B78FF52C2E242200CEEFED /* Preview Content */,
 				548997822C42856000F8EE66 /* MainTabView.swift */,
@@ -245,6 +249,8 @@
 				54172D752C4BB6B300198E7D /* ActiveTripsView.swift */,
 				54172D772C4BC04D00198E7D /* TripDetailsView.swift */,
 				54172D792C4BC09B00198E7D /* TripInfo.swift */,
+				54172D8A2C4C481B00198E7D /* AppDelegate.swift */,
+				54172D8D2C4C79E100198E7D /* UserViewModel.swift */,
 			);
 			path = testing;
 			sourceTree = "<group>";
@@ -445,6 +451,7 @@
 				548997032C41CD7800F8EE66 /* LoginView.swift in Sources */,
 				54B78FF22C2E242000CEEFED /* ContentView.swift in Sources */,
 				54172D742C4BB3BF00198E7D /* AccountInformationView.swift in Sources */,
+				54172D8B2C4C481B00198E7D /* AppDelegate.swift in Sources */,
 				54172D762C4BB6B300198E7D /* ActiveTripsView.swift in Sources */,
 				54B78FF02C2E242000CEEFED /* testingApp.swift in Sources */,
 				548997912C4B07F300F8EE66 /* SearchView.swift in Sources */,
@@ -453,6 +460,7 @@
 				54172D782C4BC04D00198E7D /* TripDetailsView.swift in Sources */,
 				54172D722C4BA22600198E7D /* MyTripsView.swift in Sources */,
 				5489978D2C49819A00F8EE66 /* CreateView.swift in Sources */,
+				54172D8E2C4C79E100198E7D /* UserViewModel.swift in Sources */,
 				548997832C42856000F8EE66 /* MainTabView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

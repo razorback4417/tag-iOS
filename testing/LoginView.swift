@@ -9,12 +9,18 @@
 import SwiftUI
 
 struct LoginView: View {
+    @StateObject private var userViewModel = UserViewModel()
+    @State private var path = NavigationPath()
+    
     @State private var username = ""
+    
+    @State private var email = ""
     @State private var password = ""
     @State private var isLoggedIn = false
     
     var body: some View {
-        NavigationView {
+//        NavigationView {
+        NavigationStack(path: $path) {
             ZStack {
                 Color.white.edgesIgnoringSafeArea(.all)
                 
@@ -32,7 +38,8 @@ struct LoginView: View {
                         HStack {
                             Image(systemName: "person")
                                 .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-                            TextField("Username or Email", text: $username)
+//                            TextField("Username or Email", text: $username)
+                            TextField("Email", text: $email)
                                 .font(Font.custom("BeVietnamPro-Regular", size: 12))
                                 .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                         }
@@ -55,7 +62,9 @@ struct LoginView: View {
                         
                         Button(action: {
                             // Handle login action
-                            isLoggedIn = true
+                            print("Here in login")
+                            userViewModel.signIn(email: email, password: password)
+//                            isLoggedIn = true
                         }) {
                             Text("Login")
                                 .font(Font.custom("BeVietnamPro-Regular", size: 13).weight(.bold))
@@ -79,7 +88,9 @@ struct LoginView: View {
                     
                     Spacer()
                     
-                    NavigationLink(destination: RegistrationView1()) {
+                    Button(action: {
+                        path.append("RegistrationView1")
+                    }) {
                         Text("Don't have an account? Register ")
                             .font(Font.custom("BeVietnamPro-Regular", size: 14))
                             .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
@@ -91,6 +102,20 @@ struct LoginView: View {
                     .padding(.bottom, 20)
                 }
             }
+            .navigationDestination(for: String.self) { destination in
+                switch destination {
+                case "RegistrationView1":
+                    RegistrationView1(userViewModel: userViewModel, path: $path)
+                case "RegistrationView2":
+                    RegistrationView2(userViewModel: userViewModel, path: $path)
+                case "RegistrationView3":
+                    RegistrationView3(userViewModel: userViewModel, path: $path)
+                case "RegistrationConfirmView":
+                    RegistrationConfirmView(path: $path)
+                default:
+                    EmptyView()
+                }
+            }
             .fullScreenCover(isPresented: $isLoggedIn) {
                 MainTabView()
             }
@@ -99,6 +124,9 @@ struct LoginView: View {
 }
 
 struct RegistrationView1: View {
+    @ObservedObject var userViewModel: UserViewModel
+    @Binding var path: NavigationPath
+    
     @Environment(\.presentationMode) var presentationMode
     @State private var name = ""
     @State private var surname = ""
@@ -156,7 +184,18 @@ struct RegistrationView1: View {
                 .padding(.top, 40)
                 .padding(.horizontal, 20)
                 
-                NavigationLink(destination: RegistrationView2()) {
+                Button(action: {
+                    let step1Data = RegistrationStep1Data(
+                        name: name,
+                        surname: surname,
+                        email: email,
+                        username: username,
+                        phone: phone,
+                        password: password
+                    )
+                    userViewModel.startRegistration(step1Data: step1Data)
+                    path.append("RegistrationView2")
+                }) {
                     Text("Next")
                         .font(Font.custom("BeVietnamPro-Regular", size: 13).weight(.bold))
                         .foregroundColor(.white)
@@ -171,11 +210,14 @@ struct RegistrationView1: View {
                 Spacer()
             }
         }
-        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
     }
 }
 
 struct RegistrationView2: View {
+    @ObservedObject var userViewModel: UserViewModel
+    @Binding var path: NavigationPath
+    
     @Environment(\.presentationMode) var presentationMode
     @State private var gender = ""
     @State private var major = ""
@@ -223,8 +265,17 @@ struct RegistrationView2: View {
                 }
                 .padding(.top, 40)
                 .padding(.horizontal, 20)
-                
-                NavigationLink(destination: RegistrationView3()) {
+
+                Button(action: {
+                    let step2Data = RegistrationStep2Data(
+                        gender: gender,
+                        major: major,
+                        school: school,
+                        interests: interests
+                    )
+                    userViewModel.continueRegistration(step2Data: step2Data)
+                    path.append("RegistrationView3")
+                }) {
                     Text("Next")
                         .font(Font.custom("BeVietnamPro-Regular", size: 13).weight(.bold))
                         .foregroundColor(.white)
@@ -244,16 +295,21 @@ struct RegistrationView2: View {
                     .padding(.bottom, 20)
             }
         }
-        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
     }
 }
 
 struct RegistrationView3: View {
+    @ObservedObject var userViewModel: UserViewModel
+    @Binding var path: NavigationPath
+    
     @Environment(\.presentationMode) var presentationMode
     @State private var cardNumber = ""
     @State private var expiryDate = ""
     @State private var securityCode = ""
     @State private var cardholderName = ""
+    
+    @State private var navigateToConfirmation = false
     
     var body: some View {
         ZStack {
@@ -318,9 +374,11 @@ struct RegistrationView3: View {
                             .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                         InputField(icon: "person", placeholder: "Full Name", text: $cardholderName)
                     }
-                    
                     Button(action: {
                         // Handle create account action
+                        userViewModel.finishRegistration()
+                        path.append("RegistrationConfirmView")
+                        print("Account Created")
                     }) {
                         Text("Create Account")
                             .font(Font.custom("BeVietnamPro-Regular", size: 13).weight(.bold))
@@ -354,6 +412,54 @@ struct RegistrationView3: View {
     }
 }
 
+struct RegistrationConfirmView: View {
+//    @Environment(\.presentationMode) var presentationMode
+    @Binding var path: NavigationPath
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+            
+            Image(systemName: "checkmark.seal.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 136, height: 136)
+                .foregroundColor(Color(red: 0.06, green: 0.36, blue: 0.22))
+            
+            Text("Your account has been created.")
+                .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
+                .multilineTextAlignment(.center)
+            
+            Text("Please login to your account to get started.")
+                .font(.system(size: 15))
+                .foregroundColor(.gray)
+                .multilineTextAlignment(.center)
+            
+            Spacer()
+            
+            Button(action: {
+                print("Account Creation Confirmed")
+                path = NavigationPath()
+                print("Path cleared")
+            }) {
+                NavigationLink(destination: LoginView()) {
+                    Text("Login to my account")
+                        .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 53)
+                        .background(Color(red: 0.06, green: 0.36, blue: 0.22))
+                        .cornerRadius(8)
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 20)
+        }
+        .navigationBarBackButtonHidden(true)
+    }
+}
+
+
 struct InputField: View {
     let icon: String
     let placeholder: String
@@ -386,27 +492,75 @@ struct LoginView_Previews: PreviewProvider {
         LoginView()
     }
 }
+//
+//struct RegistrationView1_Previews: PreviewProvider {
+//    static var previews: some View {
+//        NavigationView {
+//            RegistrationView1()
+//        }
+//    }
+//}
+//
+//struct RegistrationView2_Previews: PreviewProvider {
+//    static var previews: some View {
+//        NavigationView {
+//            RegistrationView2()
+//        }
+//    }
+//}
+//
+//struct RegistrationView3_Previews: PreviewProvider {
+//    static var previews: some View {
+//        NavigationView {
+//            RegistrationView3()
+//        }
+//    }
+//}
+//
+//struct RegistrationConfirmView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        NavigationView {
+//            RegistrationConfirmView()
+//        }
+//    }
+//}
 
 struct RegistrationView1_Previews: PreviewProvider {
+    @State static var previewPath = NavigationPath()
+    
     static var previews: some View {
-        NavigationView {
-            RegistrationView1()
+        NavigationStack(path: $previewPath) {
+            RegistrationView1(userViewModel: UserViewModel(), path: $previewPath)
         }
     }
 }
 
 struct RegistrationView2_Previews: PreviewProvider {
+    @State static var previewPath = NavigationPath()
+    
     static var previews: some View {
-        NavigationView {
-            RegistrationView2()
+        NavigationStack(path: $previewPath) {
+            RegistrationView2(userViewModel: UserViewModel(), path: $previewPath)
         }
     }
 }
 
 struct RegistrationView3_Previews: PreviewProvider {
+    @State static var previewPath = NavigationPath()
+    
     static var previews: some View {
-        NavigationView {
-            RegistrationView3()
+        NavigationStack(path: $previewPath) {
+            RegistrationView3(userViewModel: UserViewModel(), path: $previewPath)
+        }
+    }
+}
+
+struct RegistrationConfirmView_Previews: PreviewProvider {
+    @State static var previewPath = NavigationPath()
+    
+    static var previews: some View {
+        NavigationStack(path: $previewPath) {
+            RegistrationConfirmView(path: $previewPath)
         }
     }
 }
