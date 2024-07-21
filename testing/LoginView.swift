@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct LoginView: View {
+    @State private var keyboardHeight: CGFloat = 0
+    
     @StateObject private var userViewModel = UserViewModel()
     @State private var path = NavigationPath()
     
