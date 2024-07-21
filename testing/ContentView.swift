@@ -1,3 +1,9 @@
+//struct ContentView: View {
+//    var body: some View {
+//        MainTabView()
+//    }
+//}
+
 //
 //  ContentView.swift
 //  testing
@@ -5,20 +11,29 @@
 //  Created by Theo L on 6/27/24.
 //
 
-//optino command left and right arrows
-
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var userViewModel: UserViewModel
+    
     var body: some View {
-        MainTabView()
+        Group {
+            if userViewModel.isLoggedIn {
+                MainTabView()
+            } else {
+                LoginView()
+            }
+        }
+        .onAppear {
+            userViewModel.checkUserStatus()
+        }
     }
 }
 
-
-
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+            .environmentObject(UserViewModel())
+    }
 }
-
 

@@ -19,16 +19,28 @@
 import SwiftUI
 import Firebase
 
+//@main
+//struct testingApp: App {
+//    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+//    @StateObject private var userViewModel = UserViewModel()
+//    
+//    var body: some Scene {
+//        WindowGroup {
+//            LoginView()
+//                .environmentObject(userViewModel)
+//        }
+//    }
+//}
+
 @main
-struct TestingApp: App {
+struct testingApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var userViewModel = UserViewModel()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(userViewModel)
         }
     }
 }
-
-

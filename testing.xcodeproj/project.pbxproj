@@ -18,9 +18,9 @@
 		54172D832C4C45F000198E7D /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 54172D822C4C45F000198E7D /* FirebaseFirestore */; };
 		54172D852C4C45F000198E7D /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 54172D842C4C45F000198E7D /* FirebaseFirestoreSwift */; };
 		54172D872C4C45F000198E7D /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 54172D862C4C45F000198E7D /* FirebaseStorage */; };
-		54172D892C4C463400198E7D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 54172D882C4C463400198E7D /* GoogleService-Info.plist */; };
 		54172D8B2C4C481B00198E7D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54172D8A2C4C481B00198E7D /* AppDelegate.swift */; };
 		54172D8E2C4C79E100198E7D /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54172D8D2C4C79E100198E7D /* UserViewModel.swift */; };
+		54172D902C4D19AB00198E7D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 54172D8F2C4D19AB00198E7D /* GoogleService-Info.plist */; };
 		548997032C41CD7800F8EE66 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548997022C41CD7800F8EE66 /* LoginView.swift */; };
 		548997602C42678D00F8EE66 /* BeVietnamPro-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5489974E2C42678D00F8EE66 /* BeVietnamPro-Light.ttf */; };
 		548997612C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5489974F2C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf */; };
@@ -84,9 +84,9 @@
 		54172D752C4BB6B300198E7D /* ActiveTripsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveTripsView.swift; sourceTree = "<group>"; };
 		54172D772C4BC04D00198E7D /* TripDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailsView.swift; sourceTree = "<group>"; };
 		54172D792C4BC09B00198E7D /* TripInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripInfo.swift; sourceTree = "<group>"; };
-		54172D882C4C463400198E7D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		54172D8A2C4C481B00198E7D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		54172D8D2C4C79E100198E7D /* UserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewModel.swift; sourceTree = "<group>"; };
+		54172D8F2C4D19AB00198E7D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		548997022C41CD7800F8EE66 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		5489974E2C42678D00F8EE66 /* BeVietnamPro-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BeVietnamPro-Light.ttf"; sourceTree = "<group>"; };
 		5489974F2C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BeVietnamPro-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
@@ -212,7 +212,7 @@
 		54B78FE32C2E242000CEEFED = {
 			isa = PBXGroup;
 			children = (
-				54172D882C4C463400198E7D /* GoogleService-Info.plist */,
+				54172D8F2C4D19AB00198E7D /* GoogleService-Info.plist */,
 				54B78FEE2C2E242000CEEFED /* testing */,
 				54B78FFF2C2E242200CEEFED /* testingTests */,
 				54B790092C2E242200CEEFED /* testingUITests */,
@@ -399,6 +399,7 @@
 				5489976E2C42678D00F8EE66 /* BeVietnamPro-SemiBoldItalic.ttf in Resources */,
 				548997692C42678D00F8EE66 /* BeVietnamPro-ExtraLight.ttf in Resources */,
 				548997642C42678D00F8EE66 /* BeVietnamPro-Thin.ttf in Resources */,
+				54172D902C4D19AB00198E7D /* GoogleService-Info.plist in Resources */,
 				548997612C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf in Resources */,
 				54B78FF72C2E242200CEEFED /* Preview Assets.xcassets in Resources */,
 				548997802C42700900F8EE66 /* Manrope-Light.ttf in Resources */,
@@ -408,7 +409,6 @@
 				5489977E2C42700900F8EE66 /* Manrope-Regular.ttf in Resources */,
 				548997602C42678D00F8EE66 /* BeVietnamPro-Light.ttf in Resources */,
 				5489977F2C42700900F8EE66 /* Manrope-ExtraBold.ttf in Resources */,
-				54172D892C4C463400198E7D /* GoogleService-Info.plist in Resources */,
 				54B78FF42C2E242200CEEFED /* Assets.xcassets in Resources */,
 				5489977B2C42700900F8EE66 /* Manrope-Bold.ttf in Resources */,
 				548997682C42678D00F8EE66 /* BeVietnamPro-ExtraBold.ttf in Resources */,

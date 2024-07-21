@@ -9,9 +9,9 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State private var keyboardHeight: CGFloat = 0
+    @EnvironmentObject private var userViewModel: UserViewModel
     
-    @StateObject private var userViewModel = UserViewModel()
+//    @StateObject private var userViewModel = UserViewModel() JUST REPLACED 4:30
     @State private var path = NavigationPath()
     
     @State private var username = ""
@@ -20,8 +20,19 @@ struct LoginView: View {
     @State private var password = ""
     @State private var isLoggedIn = false
     
+    //NEW BODY
     var body: some View {
-//        NavigationView {
+            Group {
+                if userViewModel.isLoggedIn {
+                    MainTabView()
+                } else {
+                    loginContent
+                }
+            }
+        }
+    
+//    var body: some View {
+    var loginContent: some View {
         NavigationStack(path: $path) {
             ZStack {
                 Color.white.edgesIgnoringSafeArea(.all)
@@ -40,7 +51,6 @@ struct LoginView: View {
                         HStack {
                             Image(systemName: "person")
                                 .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-//                            TextField("Username or Email", text: $username)
                             TextField("Email", text: $email)
                                 .font(Font.custom("BeVietnamPro-Regular", size: 12))
                                 .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
@@ -66,7 +76,7 @@ struct LoginView: View {
                             // Handle login action
                             print("Here in login")
                             userViewModel.signIn(email: email, password: password)
-//                            isLoggedIn = true
+                            //                            isLoggedIn = true
                         }) {
                             Text("Login")
                                 .font(Font.custom("BeVietnamPro-Regular", size: 13).weight(.bold))
