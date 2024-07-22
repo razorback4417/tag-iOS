@@ -117,6 +117,7 @@ struct SearchView: View {
                         }
                         
                         Button(action: {
+                            print("Navigating to my trips")
                             showActiveTrips = true
                         }) {
                             Text("Search")
