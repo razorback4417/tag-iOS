@@ -16,6 +16,7 @@ struct User: Codable, Identifiable {
     let username: String
     let phoneNumber: String
     let gender: String
+    let school: String
     let major: String
     let interests: [String]
 }
@@ -91,6 +92,7 @@ class UserViewModel: ObservableObject {
             username: step1.username,
             phoneNumber: step1.phone,
             gender: step2.gender,
+            school: step2.school,
             major: step2.major,
             interests: step2.interests.components(separatedBy: ",")
         )
@@ -131,9 +133,12 @@ class UserViewModel: ObservableObject {
             if let document = document, document.exists {
                 do {
                     self.user = try document.data(as: User.self)
+                    print("Fetched user data: \(String(describing: self.user))")
                 } catch {
                     print("Error decoding user data: \(error.localizedDescription)")
                 }
+            } else {
+                print("User document does not exist")
             }
         }
     }

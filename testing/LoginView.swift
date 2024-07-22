@@ -76,7 +76,7 @@ struct LoginView: View {
                             // Handle login action
                             print("Here in login")
                             userViewModel.signIn(email: email, password: password)
-                            //                            isLoggedIn = true
+                            //isLoggedIn = true
                         }) {
                             Text("Login")
                                 .font(Font.custom("BeVietnamPro-Regular", size: 13).weight(.bold))
@@ -479,20 +479,22 @@ struct InputField: View {
     var isSecure: Bool = false
     
     var body: some View {
-        HStack {
+        HStack(spacing: 10) {
             Image(systemName: icon)
                 .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-            if isSecure {
-                SecureField(placeholder, text: $text)
-                    .font(Font.custom("BeVietnamPro-Regular", size: 12))
-                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-            } else {
-                TextField(placeholder, text: $text)
-                    .font(Font.custom("BeVietnamPro-Regular", size: 12))
-                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                .frame(width: 20)
+            
+            Group {
+                if isSecure {
+                    SecureField(placeholder, text: $text)
+                } else {
+                    TextField(placeholder, text: $text)
+                }
             }
+            .font(Font.custom("BeVietnamPro-Regular", size: 12))
+            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
         }
-        .padding()
+        .padding(.horizontal, 12)
         .frame(height: 44)
         .background(Color(red: 0.95, green: 0.95, blue: 0.95))
         .cornerRadius(8)

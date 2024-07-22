@@ -85,6 +85,9 @@ struct AccountInformationView: View {
                     }
                 }
                 .padding()
+                .onAppear {
+                    print("User data: \(String(describing: userViewModel.user))")
+                }
             }
             .navigationBarTitle("Account Information", displayMode: .inline)
             .navigationBarItems(leading: Button(action: {
@@ -108,7 +111,7 @@ struct AccountInformationView: View {
 struct Account_Preview: PreviewProvider {
     static var previews: some View {
         let mockViewModel = UserViewModel()
-        mockViewModel.user = User(id: "1", firstName: "John", lastName: "Doe", email: "john@example.com", username: "johndoe", phoneNumber: "1234567890", gender: "Male", major: "Computer Science", interests: ["Coding", "Music"])
+        mockViewModel.user = User(id: "1", firstName: "John", lastName: "Doe", email: "john@example.com", username: "johndoe", phoneNumber: "1234567890", gender: "Male", school: "UCLA", major: "Computer Science", interests: ["Coding", "Music"])
         
         return AccountInformationView()
             .environmentObject(mockViewModel)
