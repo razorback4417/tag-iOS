@@ -479,22 +479,20 @@ struct InputField: View {
     var isSecure: Bool = false
     
     var body: some View {
-        HStack(spacing: 10) {
+        HStack {
             Image(systemName: icon)
                 .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-                .frame(width: 20)
-            
-            Group {
-                if isSecure {
-                    SecureField(placeholder, text: $text)
-                } else {
-                    TextField(placeholder, text: $text)
-                }
+            if isSecure {
+                SecureField(placeholder, text: $text)
+                    .font(Font.custom("BeVietnamPro-Regular", size: 12))
+                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+            } else {
+                TextField(placeholder, text: $text)
+                    .font(Font.custom("BeVietnamPro-Regular", size: 12))
+                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
             }
-            .font(Font.custom("BeVietnamPro-Regular", size: 12))
-            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
         }
-        .padding(.horizontal, 12)
+        .padding()
         .frame(height: 44)
         .background(Color(red: 0.95, green: 0.95, blue: 0.95))
         .cornerRadius(8)
