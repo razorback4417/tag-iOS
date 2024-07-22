@@ -10,6 +10,8 @@ import SwiftUI
 struct AccountInformationView: View {
     @Environment(\.presentationMode) var presentationMode
     
+    @EnvironmentObject var userViewModel: UserViewModel
+    
     let darkGreenColor = Color(red: 0.06, green: 0.36, blue: 0.22)
 
     var body: some View {
@@ -45,9 +47,11 @@ struct AccountInformationView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Mayu Yamaguchi")
+//                            Text("Mayu Yamaguchi")
+                            Text("\(userViewModel.user?.firstName ?? "") \(userViewModel.user?.lastName ?? "")")
                                 .font(.system(size: 18, weight: .bold))
-                            Text("she/her/hers")
+//                            Text("she/her/hers")
+                            Text(userViewModel.user?.gender ?? "")
                                 .font(.system(size: 12))
                                 .foregroundColor(.gray)
                             HStack {
@@ -65,7 +69,7 @@ struct AccountInformationView: View {
                     Text("General Info")
                         .font(.system(size: 18, weight: .bold))
                     
-                    ForEach(["School", "Major", "Hobbies"], id: \.self) { item in
+                    ForEach(["School", "Major", "Interests"], id: \.self) { item in
                         HStack {
                             Image(systemName: item == "School" ? "building.columns" : (item == "Major" ? "book" : "star"))
                                 .foregroundColor(.white)
@@ -81,6 +85,9 @@ struct AccountInformationView: View {
                     }
                 }
                 .padding()
+                .onAppear {
+                    print("User data: \(String(describing: userViewModel.user))")
+                }
             }
             .navigationBarTitle("Account Information", displayMode: .inline)
             .navigationBarItems(leading: Button(action: {
@@ -95,8 +102,18 @@ struct AccountInformationView: View {
 }
 
 
+//struct Account_Preview: PreviewProvider {
+//    static var previews: some View {
+//        AccountInformationView()
+//    }
+//}
+
 struct Account_Preview: PreviewProvider {
     static var previews: some View {
-        AccountInformationView()
+        let mockViewModel = UserViewModel()
+        mockViewModel.user = User(id: "1", firstName: "John", lastName: "Doe", email: "john@example.com", username: "johndoe", phoneNumber: "1234567890", gender: "Male", school: "UCLA", major: "Computer Science", interests: ["Coding", "Music"])
+        
+        return AccountInformationView()
+            .environmentObject(mockViewModel)
     }
 }

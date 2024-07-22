@@ -8,6 +8,9 @@ import SwiftUI
 
 struct SettingsView: View {
     @State private var showAccountInfo = false
+    @EnvironmentObject var userViewModel: UserViewModel
+    
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         NavigationView {
@@ -33,6 +36,10 @@ struct SettingsView: View {
                     
                     Button(action: {
                         // Handle logout action
+                        print("Logout done")
+                        userViewModel.signOut()
+                        // Dismiss the current view to return to the login screen
+                        presentationMode.wrappedValue.dismiss()
                     }) {
                         Text("Logout")
                             .font(.system(size: 13, weight: .bold))
@@ -51,6 +58,7 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showAccountInfo) {
             AccountInformationView()
+                .environmentObject(userViewModel)
         }
     }
 }
