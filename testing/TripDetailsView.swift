@@ -47,7 +47,7 @@ struct TripDetailsView: View {
                         .foregroundColor(Color(red: 0.06, green: 0.36, blue: 0.22))
                 }
                 
-                Text(trip.date)
+                Text(formatDate(trip.date))
                     .font(.custom("BeVietnamPro-Regular", size: 12))
                     .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                 
@@ -127,6 +127,24 @@ struct TripDetailsView: View {
         .edgesIgnoringSafeArea(.all)
         .navigationBarHidden(true)
     }
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
+    }
+
+    private func formatTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter.string(from: date)
+    }
+
+    private func formatDateShort(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE, MMM d"
+        return formatter.string(from: date)
+    }
 }
 
 struct DetailRow: View {
@@ -149,12 +167,14 @@ struct DetailRow: View {
 struct TripDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         TripDetailsView(trip: TripInfo(
+            id: nil,
+            host: ["John Doe", "123-456-7890"],
             from: "Evans Hall",
             to: "SFO, Terminal Two",
-            date: "Thurs, July 11",
+            date: Date(), // Use the current date for the preview
+            spots: "3/4 spots",
             distance: "0.2 Miles from your current location",
-            price: "$6.33",
-            spots: "3/4 spots"
+            price: "$6.33"
         ))
     }
 }

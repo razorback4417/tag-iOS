@@ -6,14 +6,15 @@
 //
 
 import Foundation
+import FirebaseFirestoreSwift
 
-struct TripInfo: Identifiable {
-    let id = UUID()
+struct TripInfo: Identifiable, Codable {
+    @DocumentID var id: String?
+    let host: [String]  // [name, phoneNumber]
     let from: String
     let to: String
-    let date: String
+    let date: Date
+    let spots: String
     let distance: String
     let price: String
-    let spots: String
-    // Add any additional properties needed for TripDetailsView
 }

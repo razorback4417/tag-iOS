@@ -8,8 +8,15 @@
 import SwiftUI
 
 struct CreateView: View {
+    @StateObject private var tripViewModel = TripViewModel()
+    @EnvironmentObject private var userViewModel: UserViewModel
     @Binding var isPresented: Bool
     @State private var currentStep = 1
+    @State private var selection: String? = "Just me"
+    @State private var pickupLocation = ""
+    @State private var destination = ""
+    @State private var selectedDate = Date()
+    @State private var selectedTime = Date()
     
     var onViewMyTrip: () -> Void
     
@@ -35,13 +42,13 @@ struct CreateView: View {
                 Group {
                     switch currentStep {
                     case 1:
-                        Step1View(currentStep: $currentStep)
+                        Step1View(currentStep: $currentStep, selection: $selection)
                     case 2:
-                        Step2View(currentStep: $currentStep)
+                        Step2View(currentStep: $currentStep, pickupLocation: $pickupLocation, destination: $destination)
                     case 3:
-                        Step3View(currentStep: $currentStep)
+                        Step3View(currentStep: $currentStep, selectedDate: $selectedDate, selectedTime: $selectedTime)
                     case 4:
-                        Step4View(currentStep: $currentStep)
+                        Step4View(currentStep: $currentStep, viewModel: tripViewModel, tripInfo: createTripInfo())
                     case 5:
                         Step5View(currentStep: $currentStep, onViewMyTrip: onViewMyTrip)
                     default:
@@ -68,11 +75,32 @@ struct CreateView: View {
             .navigationBarTitle(currentStep < 5 ? "Create Trip" : "", displayMode: .inline)
         }
     }
+    private func createTripInfo() -> TripInfo {
+        guard let user = userViewModel.user else {
+            fatalError("User data not available")
+        }
+        
+        let combinedDateTime = Calendar.current.date(bySettingHour: Calendar.current.component(.hour, from: selectedTime),
+                                                     minute: Calendar.current.component(.minute, from: selectedTime),
+                                                     second: 0,
+                                                     of: selectedDate) ?? selectedDate
+        
+        return TripInfo(
+            host: ["\(user.firstName) \(user.lastName)", user.phoneNumber],
+            from: pickupLocation,
+            to: destination,
+            date: combinedDateTime,
+            spots: "1/4 spots",
+            distance: "N/A",
+            price: "N/A"
+        )
+    }
 }
 
 struct Step1View: View {
     @Binding var currentStep: Int
-    @State private var selection: String? = "Just me"
+    @Binding var selection: String?
+    @EnvironmentObject private var userViewModel: UserViewModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -93,11 +121,22 @@ struct Step1View: View {
             .padding(.horizontal, 24)
             
             VStack(spacing: 10) {
-                SelectionButton(title: "Just me", subtitle: "Find other verified students to share the ride with", isSelected: selection == "Just me", action: { selection = "Just me" })
-                
-                SelectionButton(title: "Friends", subtitle: "Create a private trip with an invite code to send out", isSelected: selection == "Friends", action: { selection = "Friends" })
-            }
+                        SelectionButton(title: "Just me", subtitle: "Find other verified students to share the ride with", isSelected: selection == "Just me", action: { selection = "Just me" })
+                        
+                        SelectionButton(title: "Friends", subtitle: "Create a private trip with an invite code to send out", isSelected: selection == "Friends", action: { selection = "Friends" })
+                    }
             .padding(.horizontal, 24) // Increase horizontal padding
+
+            if selection == "Just me", let user = userViewModel.user {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Host Information")
+                        .font(.headline)
+                    
+                    Text("Name: \(user.firstName) \(user.lastName)")
+                    Text("Phone: \(user.phoneNumber)")
+                }
+                .padding(.horizontal, 24)
+            }
             
             Spacer()
             
@@ -160,8 +199,8 @@ struct SelectionButton: View {
 
 struct Step2View: View {
     @Binding var currentStep: Int
-    @State private var pickupLocation = ""
-    @State private var destination = ""
+    @Binding var pickupLocation: String
+    @Binding var destination: String
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -242,8 +281,9 @@ struct Step2View: View {
 
 struct Step3View: View {
     @Binding var currentStep: Int
-    @State private var selectedDate = Date()
-    @State private var selectedTime = Date()
+    @Binding var selectedDate: Date
+    @Binding var selectedTime: Date
+    @State private var currentMonth = Date()
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -267,18 +307,21 @@ struct Step3View: View {
             // Calendar
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text("July 2024")
+                    Text(monthYearString(from: currentMonth))
                         .font(.system(size: 17, weight: .semibold))
                     Spacer()
                     HStack(spacing: 20) {
-                        Image(systemName: "chevron.left")
-                        Image(systemName: "chevron.right")
+                        Button(action: { previousMonth() }) {
+                            Image(systemName: "chevron.left")
+                        }
+                        Button(action: { nextMonth() }) {
+                            Image(systemName: "chevron.right")
+                        }
                     }
                     .foregroundColor(.blue)
                 }
                 
-                // Custom calendar view would go here
-                // For now, we'll use a placeholder
+                // Custom calendar view placeholder
                 Rectangle()
                     .fill(Color(red: 0.95, green: 0.95, blue: 0.95))
                     .frame(height: 250)
@@ -296,7 +339,7 @@ struct Step3View: View {
                     .font(.system(size: 17, weight: .semibold))
                 
                 HStack {
-                    Text("9:41 PM")
+                    Text(timeString(from: selectedTime))
                         .font(.system(size: 17))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -326,10 +369,31 @@ struct Step3View: View {
             .padding(.bottom, 20)
         }
     }
+    private func monthYearString(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter.string(from: date)
+    }
+    
+    private func timeString(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter.string(from: date)
+    }
+    
+    private func previousMonth() {
+        currentMonth = Calendar.current.date(byAdding: .month, value: -1, to: currentMonth) ?? currentMonth
+    }
+    
+    private func nextMonth() {
+        currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth
+    }
 }
 
 struct Step4View: View {
     @Binding var currentStep: Int
+    @ObservedObject var viewModel: TripViewModel
+    let tripInfo: TripInfo
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -350,11 +414,13 @@ struct Step4View: View {
             
             // Trip details
             VStack(alignment: .leading, spacing: 16) {
-                TripDetailRow(icon: "briefcase", title: "Pickup Location", detail: "Evans Hall 9")
-                TripDetailRow(icon: "mappin.and.ellipse", title: "Drop-off Location", detail: "Twin Peaks, California")
-                TripDetailRow(icon: "clock", title: "Wed, Jun 26", detail: "8:00 AM PST")
-                TripDetailRow(icon: "dollarsign.circle", title: "Price Estimate", detail: "Based on Uber API: $13.95")
-                TripDetailRow(icon: "calendar", title: "Deadline", detail: "Others will be able to join your trip up to 2\nhours before.")
+                TripDetailRow(icon: "person", title: "Host", detail: tripInfo.host[0])
+                TripDetailRow(icon: "phone", title: "Contact", detail: tripInfo.host[1])
+                TripDetailRow(icon: "mappin.circle", title: "From", detail: tripInfo.from)
+                TripDetailRow(icon: "mappin.and.ellipse", title: "To", detail: tripInfo.to)
+                TripDetailRow(icon: "calendar", title: "Date", detail: formatDate(tripInfo.date))
+                TripDetailRow(icon: "clock", title: "Time", detail: formatTime(tripInfo.date))
+                TripDetailRow(icon: "person.3", title: "Spots", detail: tripInfo.spots)
             }
             .padding(.horizontal, 24)
             
@@ -362,6 +428,7 @@ struct Step4View: View {
             
             // Post trip button
             Button(action: {
+                viewModel.createTrip(tripInfo)
                 currentStep += 1
             }) {
                 Text("Post trip")
@@ -375,6 +442,17 @@ struct Step4View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 20)
         }
+    }
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: date)
+    }
+    
+    private func formatTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 }
 
@@ -448,5 +526,6 @@ struct Step5View: View {
 struct CreateView_Previews: PreviewProvider {
     static var previews: some View {
         CreateView(isPresented: .constant(true), onViewMyTrip: {})
+            .environmentObject(UserViewModel())
     }
 }

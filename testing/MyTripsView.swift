@@ -11,11 +11,11 @@ struct MyTripsView: View {
     @Environment(\.dismiss) var dismiss
     
     let createdTrips: [TripInfo] = [
-        TripInfo(from: "Evans Hall", to: "SFO, Terminal Two", date: "3PM, Thursday, July 11", distance: "0.2 Miles from your current location", price: "$8.45", spots: "2/4 spots")
+        TripInfo(host: ["asdf", "asdf"], from: "Evans Hall", to: "SFO, Terminal Two", date: createDate(from: "3PM, Thursday, July 11"),  spots: "2/4 spots", distance: "0.2 Miles from your current location", price: "$8.45")
     ]
     
     let joinedTrips: [TripInfo] = [
-        TripInfo(from: "Embarcadero", to: "2425 Prospect St", date: "9PM, Tuesday, July 9", distance: "0.2 Miles from your current location", price: "$6.33", spots: "3/4 spots")
+        TripInfo(host: ["qwer", "qwer"], from: "Embarcadero", to: "2425 Prospect St",  date: createDate(from: "5PM, Thursday, July 11"), spots: "3/4 spots", distance: "0.2 Miles from your current location", price: "$6.33")
     ]
     
     var body: some View {
@@ -65,6 +65,11 @@ struct MyTripsView: View {
             }
             .navigationBarHidden(true)
         }
+    }
+    static func createDate(from string: String) -> Date {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "ha, EEEE, MMMM d"
+        return dateFormatter.date(from: string) ?? Date()
     }
 }
 
