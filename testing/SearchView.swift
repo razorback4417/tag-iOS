@@ -7,6 +7,8 @@
 import SwiftUI
 
 struct SearchView: View {
+    @EnvironmentObject var userViewModel: UserViewModel
+    
     @State private var pickupLocation = ""
     @State private var destination = ""
     @State private var date = ""
@@ -156,6 +158,7 @@ struct SearchView: View {
             }
             .navigationDestination(isPresented: $showMyTrips) {
                 MyTripsView()
+                    .environmentObject(userViewModel)
             }
         }
     }

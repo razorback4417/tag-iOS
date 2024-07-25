@@ -19,8 +19,9 @@ struct User: Codable, Identifiable {
     let school: String
     let major: String
     let interests: [String]
+    var createdTrips: [String] = []  // Array of trip IDs created by the user
+    var joinedTrips: [String] = []   // Array of trip IDs joined by the user
 }
-
 class UserViewModel: ObservableObject {
     @Published var user: User?
     @Published var isLoggedIn = false
@@ -122,6 +123,7 @@ class UserViewModel: ObservableObject {
     }
     
     private func fetchUserData(userId: String) {
+        print("here inside fetch")
         db.collection("users").document(userId).getDocument { [weak self] document, error in
             guard let self = self else { return }
             
@@ -142,6 +144,7 @@ class UserViewModel: ObservableObject {
             }
         }
     }
+//    RYNfFRXhsfYPfKlIhpYXWI286TM2
     
     func updateUserData(userData: User) {
         guard let userId = Auth.auth().currentUser?.uid else { return }
@@ -151,6 +154,48 @@ class UserViewModel: ObservableObject {
             self.user = userData
         } catch {
             print("Error updating user data: \(error.localizedDescription)")
+        }
+    }
+    
+    func fetchUserTrips(completion: @escaping (Result<(created: [TripInfo], joined: [TripInfo]), Error>) -> Void) {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            completion(.failure(NSError(domain: "UserViewModel", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not logged in"])))
+            return
+        }
+        
+        let dispatchGroup = DispatchGroup()
+        var createdTrips: [TripInfo] = []
+        var joinedTrips: [TripInfo] = []
+        var fetchError: Error?
+        
+        // Fetch created trips
+        dispatchGroup.enter()
+        db.collection("trips").whereField("hostId", isEqualTo: userId).getDocuments { (querySnapshot, error) in
+            if let error = error {
+                fetchError = error
+            } else {
+                createdTrips = querySnapshot?.documents.compactMap { try? $0.data(as: TripInfo.self) } ?? []
+            }
+            dispatchGroup.leave()
+        }
+        
+        // Fetch joined trips
+        dispatchGroup.enter()
+        db.collection("trips").whereField("participantIds", arrayContains: userId).getDocuments { (querySnapshot, error) in
+            if let error = error {
+                fetchError = error
+            } else {
+                joinedTrips = querySnapshot?.documents.compactMap { try? $0.data(as: TripInfo.self) } ?? []
+            }
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            if let error = fetchError {
+                completion(.failure(error))
+            } else {
+                completion(.success((created: createdTrips, joined: joinedTrips)))
+            }
         }
     }
 }

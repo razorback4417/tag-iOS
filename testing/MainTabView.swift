@@ -14,6 +14,9 @@ struct MainTabView_Previews: PreviewProvider {
 }
 
 struct MainTabView: View {
+    @EnvironmentObject var userViewModel: UserViewModel
+    @EnvironmentObject var tripViewModel: TripViewModel
+    
     @State private var showCreateView = false
     @State private var selectedTab = 0
     @State private var navigateToMyTrips = false
@@ -34,11 +37,13 @@ struct MainTabView: View {
             .tag(0)
             
             NavigationView {
-                SearchView()
-                    .navigationDestination(isPresented: $navigateToMyTrips) {
-                        MyTripsView()
-                    }
-            }
+               SearchView()
+                   .environmentObject(tripViewModel)
+                   .navigationDestination(isPresented: $navigateToMyTrips) {
+                       MyTripsView()
+                           .environmentObject(tripViewModel)
+                   }
+           }
             .tabItem {
                 Image(systemName: "map")
                 Text("Trips")

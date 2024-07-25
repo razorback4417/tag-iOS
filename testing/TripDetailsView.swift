@@ -168,11 +168,12 @@ struct TripDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         TripDetailsView(trip: TripInfo(
             id: nil,
-            host: ["John Doe", "123-456-7890"],
+            hostId: "asdf",
             from: "Evans Hall",
             to: "SFO, Terminal Two",
             date: Date(), // Use the current date for the preview
-            spots: "3/4 spots",
+            joinedUsers: [],
+            totalSpots: 4,
             distance: "0.2 Miles from your current location",
             price: "$6.33"
         ))

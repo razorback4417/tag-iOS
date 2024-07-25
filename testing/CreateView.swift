@@ -7,9 +7,15 @@
 
 import SwiftUI
 
+import SwiftUI
+
+import SwiftUI
+
+import SwiftUI
+
 struct CreateView: View {
-    @StateObject private var tripViewModel = TripViewModel()
     @EnvironmentObject private var userViewModel: UserViewModel
+    @EnvironmentObject private var tripViewModel: TripViewModel
     @Binding var isPresented: Bool
     @State private var currentStep = 1
     @State private var selection: String? = "Just me"
@@ -17,6 +23,9 @@ struct CreateView: View {
     @State private var destination = ""
     @State private var selectedDate = Date()
     @State private var selectedTime = Date()
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+    @State private var tripInfo: TripInfo?
     
     var onViewMyTrip: () -> Void
     
@@ -48,7 +57,7 @@ struct CreateView: View {
                     case 3:
                         Step3View(currentStep: $currentStep, selectedDate: $selectedDate, selectedTime: $selectedTime)
                     case 4:
-                        Step4View(currentStep: $currentStep, viewModel: tripViewModel, tripInfo: createTripInfo())
+                        Step4View(currentStep: $currentStep, tripInfo: createTripInfo())
                     case 5:
                         Step5View(currentStep: $currentStep, onViewMyTrip: onViewMyTrip)
                     default:
@@ -74,10 +83,18 @@ struct CreateView: View {
             )
             .navigationBarTitle(currentStep < 5 ? "Create Trip" : "", displayMode: .inline)
         }
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+        }
     }
-    private func createTripInfo() -> TripInfo {
-        guard let user = userViewModel.user else {
-            fatalError("User data not available")
+    
+    private func createTripInfo() -> TripInfo? {
+        guard let user = userViewModel.user, let userId = user.id else {
+            DispatchQueue.main.async {
+                self.alertMessage = "User data not available. Please try again later."
+                self.showAlert = true
+            }
+            return nil
         }
         
         let combinedDateTime = Calendar.current.date(bySettingHour: Calendar.current.component(.hour, from: selectedTime),
@@ -86,11 +103,12 @@ struct CreateView: View {
                                                      of: selectedDate) ?? selectedDate
         
         return TripInfo(
-            host: ["\(user.firstName) \(user.lastName)", user.phoneNumber],
+            hostId: userId,
             from: pickupLocation,
             to: destination,
             date: combinedDateTime,
-            spots: "1/4 spots",
+            joinedUsers: [],
+            totalSpots: 4,  // You can make this configurable if needed
             distance: "N/A",
             price: "N/A"
         )
@@ -392,57 +410,72 @@ struct Step3View: View {
 
 struct Step4View: View {
     @Binding var currentStep: Int
-    @ObservedObject var viewModel: TripViewModel
-    let tripInfo: TripInfo
+    @EnvironmentObject private var tripViewModel: TripViewModel
+    let tripInfo: TripInfo?
+    @State private var showAlert = false
+    @State private var alertMessage = ""
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // Header
-            VStack(alignment: .leading, spacing: 5) {
-                Text("04")
-                    .font(.system(size: 50, weight: .heavy))
-                
-                Text("Trip Summary")
-                    .font(.system(size: 22, weight: .heavy))
-                
-                Text("Feel free to go back and edit your trip details")
-                    .font(.system(size: 12))
-                    .foregroundColor(.gray)
+        Group {
+            if let tripInfo = tripInfo {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Header
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("04")
+                            .font(.system(size: 50, weight: .heavy))
+                        
+                        Text("Trip Summary")
+                            .font(.system(size: 22, weight: .heavy))
+                        
+                        Text("Feel free to go back and edit your trip details")
+                            .font(.system(size: 12))
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.top, 20)
+                    .padding(.horizontal, 24)
+                    
+                    // Trip details
+                    VStack(alignment: .leading, spacing: 16) {
+                        TripDetailRow(icon: "mappin.circle", title: "From", detail: tripInfo.from)
+                        TripDetailRow(icon: "mappin.and.ellipse", title: "To", detail: tripInfo.to)
+                        TripDetailRow(icon: "calendar", title: "Date", detail: formatDate(tripInfo.date))
+                        TripDetailRow(icon: "clock", title: "Time", detail: formatTime(tripInfo.date))
+                        TripDetailRow(icon: "person.3", title: "Spots", detail: tripInfo.spots)
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    Spacer()
+                    
+                    // Post trip button
+                    Button(action: {
+                        tripViewModel.createTrip(tripInfo)
+                        currentStep += 1
+                    }) {
+                        Text("Post trip")
+                            .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 53)
+                            .background(Color(red: 0.06, green: 0.36, blue: 0.22))
+                            .cornerRadius(8)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 20)
+                }
+            } else {
+                Text("Unable to create trip. Please try again.")
+                    .padding()
+                    .onAppear {
+                        self.alertMessage = "Unable to create trip. Please try again."
+                        self.showAlert = true
+                    }
             }
-            .padding(.top, 20)
-            .padding(.horizontal, 24)
-            
-            // Trip details
-            VStack(alignment: .leading, spacing: 16) {
-                TripDetailRow(icon: "person", title: "Host", detail: tripInfo.host[0])
-                TripDetailRow(icon: "phone", title: "Contact", detail: tripInfo.host[1])
-                TripDetailRow(icon: "mappin.circle", title: "From", detail: tripInfo.from)
-                TripDetailRow(icon: "mappin.and.ellipse", title: "To", detail: tripInfo.to)
-                TripDetailRow(icon: "calendar", title: "Date", detail: formatDate(tripInfo.date))
-                TripDetailRow(icon: "clock", title: "Time", detail: formatTime(tripInfo.date))
-                TripDetailRow(icon: "person.3", title: "Spots", detail: tripInfo.spots)
-            }
-            .padding(.horizontal, 24)
-            
-            Spacer()
-            
-            // Post trip button
-            Button(action: {
-                viewModel.createTrip(tripInfo)
-                currentStep += 1
-            }) {
-                Text("Post trip")
-                    .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 53)
-                    .background(Color(red: 0.06, green: 0.36, blue: 0.22))
-                    .cornerRadius(8)
-            }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 20)
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
     }
+    
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
@@ -527,5 +560,6 @@ struct CreateView_Previews: PreviewProvider {
     static var previews: some View {
         CreateView(isPresented: .constant(true), onViewMyTrip: {})
             .environmentObject(UserViewModel())
+            .environmentObject(TripViewModel())
     }
 }
