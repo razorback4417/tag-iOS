@@ -116,4 +116,25 @@ class TripViewModel: ObservableObject {
         }
     }
     
-}
+    func deleteTrip(tripId: String, userId: String) {
+            db.collection("trips").document(tripId).delete { error in
+                if let error = error {
+                    print("Error deleting trip: \(error.localizedDescription)")
+                } else {
+                    // Remove the trip from the user's createdTrips array
+                    self.db.collection("users").document(userId).updateData([
+                        "createdTrips": FieldValue.arrayRemove([tripId])
+                    ])
+                    
+                    // Update the local trips array
+                    self.trips.removeAll { $0.id == tripId }
+                    self.fetchUserTrips(userId: userId)
+                    
+                    // Notify views that the data has changed
+                    DispatchQueue.main.async {
+                        self.objectWillChange.send()
+                    }
+                }
+            }
+        }
+    }

@@ -16,7 +16,6 @@ struct MyTripsView: View {
     @State private var errorMessage: String?
     
     var body: some View {
-        NavigationView {
             ZStack {
                 Color(red: 0.94, green: 0.94, blue: 0.94).edgesIgnoringSafeArea(.all)
                 
@@ -53,7 +52,7 @@ struct MyTripsView: View {
                                         .padding(.leading)
                                     
                                     ForEach(createdTrips) { trip in
-                                        NavigationLink(destination: TripDetailsView(trip: trip)) {
+                                        NavigationLink(destination: TripDetailsView(isFromActiveTrips: false, trip: trip)) {
                                             TripCard(trip: trip)
                                         }
                                     }
@@ -65,7 +64,7 @@ struct MyTripsView: View {
                                         .padding(.leading)
                                     
                                     ForEach(joinedTrips) { trip in
-                                        NavigationLink(destination: TripDetailsView(trip: trip)) {
+                                        NavigationLink(destination: TripDetailsView(isFromActiveTrips: false, trip: trip)) {
                                             TripCard(trip: trip)
                                         }
                                     }
@@ -82,7 +81,6 @@ struct MyTripsView: View {
             }
             .navigationBarHidden(true)
             .onAppear(perform: loadTrips)
-        }
     }
     
     private func loadTrips() {

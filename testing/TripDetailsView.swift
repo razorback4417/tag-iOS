@@ -6,16 +6,20 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct TripDetailsView: View {
+    let isFromActiveTrips: Bool
     let trip: TripInfo
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var userViewModel: UserViewModel
+    @EnvironmentObject var tripViewModel: TripViewModel
+    @State private var showingDeleteConfirmation = false
 
     var body: some View {
         VStack(spacing: 20) {
             // Header
-            Spacer()
-                    .frame(height: 10)
+            Spacer().frame(height: 10)
             HStack() {
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
@@ -37,7 +41,7 @@ struct TripDetailsView: View {
 
             // Trip details card
             VStack(alignment: .leading, spacing: 20) {
-                Text("0.2 Miles from your current location")
+                Text(trip.distance) //to be calculated
                     .font(.custom("BeVietnamPro-Regular", size: 12))
                     .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                 
@@ -54,16 +58,16 @@ struct TripDetailsView: View {
                 // Time details
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("3:00 PM")
+                        Text(formatTime(trip.date))
                             .font(.custom("BeVietnamPro-Regular", size: 10).weight(.bold))
                         Text("Departure")
                             .font(.custom("BeVietnamPro-Regular", size: 6))
-                        Text("Thurs, Jul 11")
+                        Text(formatDateShort(trip.date))
                             .font(.custom("BeVietnamPro-Regular", size: 4))
                     }
                     Spacer()
                     VStack {
-                        Text("Duration 1h 05m")
+                        Text("Duration 1h 05m") // You might want to calculate this dynamically
                             .font(.custom("BeVietnamPro-Regular", size: 6))
                         Image(systemName: "car.fill")
                             .resizable()
@@ -71,11 +75,11 @@ struct TripDetailsView: View {
                     }
                     Spacer()
                     VStack(alignment: .trailing) {
-                        Text("4:05 PM")
+                        Text(formatTime(trip.date.addingTimeInterval(3900))) // Adding 1h 05m
                             .font(.custom("BeVietnamPro-Regular", size: 10).weight(.bold))
                         Text("Arrival")
                             .font(.custom("BeVietnamPro-Regular", size: 6))
-                        Text("Thurs, Jul 11")
+                        Text(formatDateShort(trip.date))
                             .font(.custom("BeVietnamPro-Regular", size: 4))
                     }
                 }
@@ -84,12 +88,12 @@ struct TripDetailsView: View {
                 // Trip details grid
                 HStack(alignment: .top, spacing: 77) {
                     VStack(alignment: .leading, spacing: 5) {
-                        DetailRow(title: "Trip Owner", value: "Theo")
-                        DetailRow(title: "Passengers", value: "3/4 students")
-                        DetailRow(title: "Deadline", value: "3:00 PM Weds, July 10")
+                        DetailRow(title: "Trip Owner", value: trip.hostId)
+                        DetailRow(title: "Passengers", value: "\(trip.joinedUsers.count)/\(trip.totalSpots) students")
+                        DetailRow(title: "Deadline", value: formatDate(trip.date.addingTimeInterval(-86400))) // 1 day before
                     }
                     VStack(alignment: .leading, spacing: 5) {
-                        DetailRow(title: "Price Estimate", value: "$6.33")
+                        DetailRow(title: "Price Estimate", value: trip.price)
                         DetailRow(title: "Trip Status", value: "Active")
                     }
                 }
@@ -106,22 +110,66 @@ struct TripDetailsView: View {
 
             Spacer()
 
-            // Join trip button
-            Button(action: {
-                // Action to join trip
-            }) {
-                Text("Join trip")
-                    .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 47)
-                    .background(Color(red: 0.06, green: 0.36, blue: 0.22))
-                    .cornerRadius(8)
+            if isFromActiveTrips {
+                if trip.hostId != Auth.auth().currentUser?.uid && !trip.joinedUsers.contains(Auth.auth().currentUser?.uid ?? "") {
+                    Button(action: {
+                        tripViewModel.joinTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "")
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Text("Join Trip")
+                            .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 47)
+                            .background(Color(red: 0.06, green: 0.36, blue: 0.22))
+                            .cornerRadius(8)
+                    }
+                    .padding(.horizontal, 24)
+                    Spacer()
+                }
+            } else { // From MyTripsView
+                if trip.hostId == Auth.auth().currentUser?.uid {
+                    Button(action: {
+                        showingDeleteConfirmation = true
+                    }) {
+                        Text("Delete Trip")
+                            .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: 350)
+                            .frame(height: 47)
+                            .background(Color.red)
+                            .cornerRadius(8)
+                    }
+                    .padding(.horizontal, 24)
+                    Spacer()
+                    .alert(isPresented: $showingDeleteConfirmation) {
+                        Alert(
+                            title: Text("Delete Trip"),
+                            message: Text("Are you sure you want to delete this trip?"),
+                            primaryButton: .destructive(Text("Delete")) {
+                                tripViewModel.deleteTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "")
+                                presentationMode.wrappedValue.dismiss()
+                            },
+                            secondaryButton: .cancel()
+                        )
+                    }
+                } else if trip.joinedUsers.contains(Auth.auth().currentUser?.uid ?? "") {
+                    Button(action: {
+                        tripViewModel.leaveTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "")
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Text("Leave Trip")
+                            .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: 350)
+                            .frame(height: 47)
+                            .background(Color.orange)
+                            .cornerRadius(8)
+                    }
+                    .padding(.horizontal, 24)
+                    Spacer()
+                }
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 20)
-            
-            Spacer()
         }
         .background(Color(red: 0.94, green: 0.94, blue: 0.94))
         .edgesIgnoringSafeArea(.all)
@@ -166,16 +214,23 @@ struct DetailRow: View {
 
 struct TripDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        TripDetailsView(trip: TripInfo(
-            id: nil,
-            hostId: "asdf",
+        let mockTrip = TripInfo(
+            id: "mockId",
+            hostId: "mockHostId",
             from: "Evans Hall",
             to: "SFO, Terminal Two",
-            date: Date(), // Use the current date for the preview
+            date: Date(),
             joinedUsers: [],
             totalSpots: 4,
             distance: "0.2 Miles from your current location",
             price: "$6.33"
-        ))
+        )
+        
+        let mockUserViewModel = UserViewModel()
+        let mockTripViewModel = TripViewModel()
+        
+        return TripDetailsView(isFromActiveTrips: true, trip: mockTrip)
+            .environmentObject(mockUserViewModel)
+            .environmentObject(mockTripViewModel)
     }
 }

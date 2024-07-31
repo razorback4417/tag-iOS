@@ -11,7 +11,13 @@ struct HomeView: View {
     @Binding var showCreateView: Bool
     var onFindRidesTapped: () -> Void
     
-    let imageURL = URL(string: "https://images.pexels.com/photos/6273480/pexels-photo-6273480.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")!
+    let imageURLFind = URL(string: "https://images.pexels.com/photos/6268943/pexels-photo-6268943.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")!
+    let imageURLCreate = URL(string: "https://images.pexels.com/photos/142853/pexels-photo-142853.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")!
+    
+    let imageURLDeal = URL(string: "https://images.pexels.com/photos/928181/pexels-photo-928181.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")!
+    let imageURLReward = URL(string: "https://images.pexels.com/photos/3434523/pexels-photo-3434523.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")!
+    
+    let imageURLFriend = URL(string: "https://images.pexels.com/photos/1036804/pexels-photo-1036804.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")!
     
     var body: some View {
         ScrollView {
@@ -24,18 +30,18 @@ struct HomeView: View {
                 
                 // Find a Tag anywhere
                 SectionView(title: "Find a Tag anywhere", items: [
-                    SectionItem(imageURL: imageURL, title: "Find rides", description: "Split ride costs with verified students", action: onFindRidesTapped),
-                    SectionItem(imageURL: imageURL, title: "Create trip", description: "Create a new trip for others to join", action: { showCreateView = true })
+                    SectionItem(imageURL: imageURLFind, title: "Find rides", description: "Split ride costs with verified students", action: onFindRidesTapped),
+                    SectionItem(imageURL: imageURLCreate, title: "Create trip", description: "Create a new trip for others to join", action: { showCreateView = true })
                 ])
                 
                 // Rewards and Deals
                 SectionView(title: "Rewards and Deals", items: [
-                    SectionItem(imageURL: imageURL, title: "My rewards", description: "Earn rewards for each trip"),
-                    SectionItem(imageURL: imageURL, title: "Discover Deals", description: "Find restaurants to get discounts")
+                    SectionItem(imageURL: imageURLDeal, title: "My rewards", description: "Earn rewards for each trip"),
+                    SectionItem(imageURL: imageURLReward, title: "Discover Deals", description: "Find restaurants to get discounts")
                 ])
                 
                 // Join a Friend
-                JoinFriendView(imageURL: imageURL)
+                JoinFriendView(imageURL: imageURLFriend)
             }
             .padding()
         }
@@ -161,7 +167,7 @@ struct JoinFriendView: View {
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(height: 80)
+                    .frame(height: 100)
                     .clipped()
                     .cornerRadius(8)
             } placeholder: {

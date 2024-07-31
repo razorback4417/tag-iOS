@@ -35,7 +35,7 @@ struct ActiveTripsView: View {
                 ScrollView {
                     VStack(spacing: 15) {
                         ForEach(tripViewModel.trips) { trip in
-                            NavigationLink(destination: TripDetailsView(trip: trip)) {
+                            NavigationLink(destination: TripDetailsView(isFromActiveTrips: true, trip: trip)) {
                                 ActiveTripCard(trip: trip)
                             }
                         }
