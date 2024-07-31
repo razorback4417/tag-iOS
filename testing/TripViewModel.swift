@@ -89,14 +89,9 @@ class TripViewModel: ObservableObject {
             "joinedUsers": FieldValue.arrayUnion([userId])
         ]) { error in
             if let error = error {
-                print("Error joining trip: \(error.localizedDescription)")
+                print("Error joining trip: \(error)")
             } else {
-                // Update user's joinedTrips array
-                self.db.collection("users").document(userId).updateData([
-                    "joinedTrips": FieldValue.arrayUnion([tripId])
-                ])
-                self.fetchAllTrips()
-                self.fetchUserTrips(userId: userId)
+                print("Successfully joined trip")
             }
         }
     }

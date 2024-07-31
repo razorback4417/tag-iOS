@@ -181,7 +181,7 @@ class UserViewModel: ObservableObject {
         
         // Fetch joined trips
         dispatchGroup.enter()
-        db.collection("trips").whereField("participantIds", arrayContains: userId).getDocuments { (querySnapshot, error) in
+        db.collection("trips").whereField("joinedUsers", arrayContains: userId).getDocuments { (querySnapshot, error) in
             if let error = error {
                 fetchError = error
             } else {
