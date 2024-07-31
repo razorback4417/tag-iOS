@@ -39,6 +39,7 @@ struct MainTabView: View {
             NavigationView {
                SearchView()
                    .environmentObject(tripViewModel)
+                   .environmentObject(userViewModel)
                    .navigationDestination(isPresented: $navigateToMyTrips) {
                        MyTripsView()
                            .environmentObject(tripViewModel)

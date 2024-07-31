@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ActiveTripsView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var tripViewModel = TripViewModel()
+//    @StateObject private var tripViewModel = TripViewModel()
+    @EnvironmentObject var tripViewModel: TripViewModel
     
     var body: some View {
         ZStack {
@@ -34,7 +35,7 @@ struct ActiveTripsView: View {
                 
                 ScrollView {
                     VStack(spacing: 15) {
-                        ForEach(tripViewModel.trips) { trip in
+                        ForEach(tripViewModel.searchResults) { trip in
                             NavigationLink(destination: TripDetailsView(isFromActiveTrips: true, trip: trip)) {
                                 ActiveTripCard(trip: trip)
                             }
