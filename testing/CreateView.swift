@@ -6,12 +6,12 @@
 //
 
 import SwiftUI
+import MapKit
 
-import SwiftUI
-
-import SwiftUI
-
-import SwiftUI
+struct IdentifiablePointAnnotation: Identifiable {
+    let id = UUID()
+    var annotation: MKPointAnnotation
+}
 
 struct CreateView: View {
     @EnvironmentObject private var userViewModel: UserViewModel
@@ -219,9 +219,19 @@ struct Step2View: View {
     @Binding var currentStep: Int
     @Binding var pickupLocation: String
     @Binding var destination: String
-    
+    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
+    @State private var pickupAnnotation: IdentifiablePointAnnotation?
+    @State private var destinationAnnotation: IdentifiablePointAnnotation?
+    @State private var pickupSearchResults: [MKLocalSearchCompletion] = []
+    @State private var destinationSearchResults: [MKLocalSearchCompletion] = []
+    @State private var showingPickupResults = false
+    @State private var showingDestinationResults = false
+
+    let searchCompleter = MKLocalSearchCompleter()
+
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
+            // Header
             VStack(alignment: .leading, spacing: 5) {
                 Text("02")
                     .font(.system(size: 50, weight: .heavy))
@@ -235,138 +245,80 @@ struct Step2View: View {
                     .font(.custom("BeVietnamPro-Regular", size: 12))
                     .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
             }
-            .padding(.top, 20) // Add more spacing at the top
-            .padding(.horizontal, 24) // Increase horizontal padding
-            
-            VStack(spacing: 12) {
-                HStack {
-                    Image(systemName: "paperplane")
-                        .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-                    TextField("Pickup location", text: $pickupLocation)
-                        .font(.custom("BeVietnamPro-Regular", size: 14))
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color(red: 0.95, green: 0.95, blue: 0.95))
-                .cornerRadius(8)
-                
-                HStack {
-                    Image(systemName: "mappin.and.ellipse")
-                        .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-                    TextField("Destination", text: $destination)
-                        .font(.custom("BeVietnamPro-Regular", size: 14))
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color(red: 0.95, green: 0.95, blue: 0.95))
-                .cornerRadius(8)
-            }
-            .padding(.horizontal, 24) // Increase horizontal padding
-            
-            // Map placeholder
-            ZStack {
-                Rectangle()
-                    .foregroundColor(.clear)
-                    .frame(height: 250) // Reduce height slightly
-                    .background(Color(red: 0.95, green: 0.95, blue: 0.95))
-                    .cornerRadius(8)
-                    .shadow(color: Color(red: 0, green: 0, blue: 0, opacity: 0.25), radius: 4, y: 4)
-                
-                Text("Map Placeholder")
-                    .foregroundColor(.gray)
-            }
-            .padding(.horizontal, 24)
-            
-            Spacer()
-            
-            // Navigation button
-            Button(action: {
-                currentStep += 1
-            }) {
-                Text("Next")
-                    .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 53)
-                    .background(Color(red: 0.06, green: 0.36, blue: 0.22))
-                    .cornerRadius(8)
-            }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 20)
-        }
-    }
-}
-
-struct Step3View: View {
-    @Binding var currentStep: Int
-    @Binding var selectedDate: Date
-    @Binding var selectedTime: Date
-    @State private var currentMonth = Date()
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // Header
-            VStack(alignment: .leading, spacing: 5) {
-                Text("03")
-                    .font(.system(size: 50, weight: .heavy))
-                    .foregroundColor(.black)
-                
-                Text("When are you going?")
-                    .font(.system(size: 22, weight: .heavy))
-                    .foregroundColor(.black)
-                
-                Text("Choose the date and time of your upcoming trip.")
-                    .font(.system(size: 12))
-                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-            }
             .padding(.top, 20)
             .padding(.horizontal, 24)
             
-            // Calendar
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Text(monthYearString(from: currentMonth))
-                        .font(.system(size: 17, weight: .semibold))
-                    Spacer()
-                    HStack(spacing: 20) {
-                        Button(action: { previousMonth() }) {
-                            Image(systemName: "chevron.left")
-                        }
-                        Button(action: { nextMonth() }) {
-                            Image(systemName: "chevron.right")
-                        }
+            VStack(spacing: 12) {
+                // Pickup location input
+                VStack {
+                    HStack {
+                        Image(systemName: "paperplane")
+                            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                        TextField("Pickup location", text: $pickupLocation)
+                            .font(.custom("BeVietnamPro-Regular", size: 14))
+                            .onChange(of: pickupLocation) { _, newValue in
+                                searchAddress(newValue, isPickup: true)
+                            }
                     }
-                    .foregroundColor(.blue)
+                    .padding()
+                    .background(Color(red: 0.95, green: 0.95, blue: 0.95))
+                    .cornerRadius(8)
+                    
+                    if showingPickupResults {
+                        List(pickupSearchResults, id: \.self) { result in
+                            Text(result.title)
+                                .onTapGesture {
+                                    pickupLocation = result.title
+                                    showingPickupResults = false
+                                    updateAnnotation(for: result.title, isPickup: true)
+                                }
+                        }
+                        .frame(height: min(CGFloat(pickupSearchResults.count) * 44, 200))
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .shadow(radius: 5)
+                    }
                 }
-                
-                // Custom calendar view placeholder
-                Rectangle()
-                    .fill(Color(red: 0.95, green: 0.95, blue: 0.95))
-                    .frame(height: 250)
-                    .cornerRadius(13)
-                    .overlay(
-                        Text("Custom Calendar Placeholder")
-                            .foregroundColor(.gray)
-                    )
+
+                // Destination input
+                VStack {
+                    HStack {
+                        Image(systemName: "mappin.and.ellipse")
+                            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                        TextField("Destination", text: $destination)
+                            .font(.custom("BeVietnamPro-Regular", size: 14))
+                            .onChange(of: destination) { _, newValue in
+                                searchAddress(newValue, isPickup: false)
+                            }
+                    }
+                    .padding()
+                    .background(Color(red: 0.95, green: 0.95, blue: 0.95))
+                    .cornerRadius(8)
+                    
+                    if showingDestinationResults {
+                        List(destinationSearchResults, id: \.self) { result in
+                            Text(result.title)
+                                .onTapGesture {
+                                    destination = result.title
+                                    showingDestinationResults = false
+                                    updateAnnotation(for: result.title, isPickup: false)
+                                }
+                        }
+                        .frame(height: min(CGFloat(destinationSearchResults.count) * 44, 200))
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .shadow(radius: 5)
+                    }
+                }
             }
             .padding(.horizontal, 24)
             
-            // Time Picker
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Time")
-                    .font(.system(size: 17, weight: .semibold))
-                
-                HStack {
-                    Text(timeString(from: selectedTime))
-                        .font(.system(size: 17))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color(red: 0.95, green: 0.95, blue: 0.95))
-                        .cornerRadius(8)
-                    
-                    Spacer()
-                }
+            // Map
+            Map(coordinateRegion: $region, annotationItems: [pickupAnnotation, destinationAnnotation].compactMap { $0 }) { item in
+                MapMarker(coordinate: item.annotation.coordinate, tint: item.annotation == pickupAnnotation?.annotation ? .blue : .red)
             }
+            .frame(height: 250)
+            .cornerRadius(8)
             .padding(.horizontal, 24)
             
             Spacer()
@@ -386,25 +338,145 @@ struct Step3View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 20)
         }
-    }
-    private func monthYearString(from date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM yyyy"
-        return formatter.string(from: date)
-    }
-    
-    private func timeString(from date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter.string(from: date)
+        .onAppear {
+            searchCompleter.delegate = SearchCompleterDelegate(
+                pickupResults: $pickupSearchResults,
+                destinationResults: $destinationSearchResults
+            )
+        }
     }
     
-    private func previousMonth() {
-        currentMonth = Calendar.current.date(byAdding: .month, value: -1, to: currentMonth) ?? currentMonth
+    private func searchAddress(_ query: String, isPickup: Bool) {
+        if query.isEmpty {
+            if isPickup {
+                showingPickupResults = false
+            } else {
+                showingDestinationResults = false
+            }
+            return
+        }
+        
+        searchCompleter.queryFragment = query
+        
+        if isPickup {
+            showingPickupResults = true
+            showingDestinationResults = false
+        } else {
+            showingDestinationResults = true
+            showingPickupResults = false
+        }
     }
     
-    private func nextMonth() {
-        currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth
+    private func updateAnnotation(for address: String, isPickup: Bool) {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(address) { placemarks, error in
+            if let location = placemarks?.first?.location {
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = location.coordinate
+                let identifiableAnnotation = IdentifiablePointAnnotation(annotation: annotation)
+                if isPickup {
+                    pickupAnnotation = identifiableAnnotation
+                } else {
+                    destinationAnnotation = identifiableAnnotation
+                }
+                updateRegion()
+            }
+        }
+    }
+    
+    private func updateRegion() {
+        if let pickup = pickupAnnotation?.annotation.coordinate, let destination = destinationAnnotation?.annotation.coordinate {
+            let center = CLLocationCoordinate2D(
+                latitude: (pickup.latitude + destination.latitude) / 2,
+                longitude: (pickup.longitude + destination.longitude) / 2
+            )
+            let span = MKCoordinateSpan(
+                latitudeDelta: abs(pickup.latitude - destination.latitude) * 1.5,
+                longitudeDelta: abs(pickup.longitude - destination.longitude) * 1.5
+            )
+            region = MKCoordinateRegion(center: center, span: span)
+        }
+    }
+}
+
+class SearchCompleterDelegate: NSObject, MKLocalSearchCompleterDelegate {
+    @Binding var pickupResults: [MKLocalSearchCompletion]
+    @Binding var destinationResults: [MKLocalSearchCompletion]
+    
+    init(pickupResults: Binding<[MKLocalSearchCompletion]>, destinationResults: Binding<[MKLocalSearchCompletion]>) {
+        _pickupResults = pickupResults
+        _destinationResults = destinationResults
+    }
+    
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        pickupResults = completer.results
+        destinationResults = completer.results
+    }
+}
+
+struct Step3View: View {
+    @Binding var currentStep: Int
+    @Binding var selectedDate: Date
+    @Binding var selectedTime: Date
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    // Header
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("03")
+                            .font(.system(size: 50, weight: .heavy))
+                            .foregroundColor(.black)
+                        
+                        Text("When are you going?")
+                            .font(.system(size: 22, weight: .heavy))
+                            .foregroundColor(.black)
+                        
+                        Text("Choose the date and time of your upcoming trip.")
+                            .font(.system(size: 12))
+                            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                    }
+                    .padding(.top, 20)
+                    .padding(.bottom, 20)
+                    
+                    // Calendar
+                    DatePicker("Select Date", selection: $selectedDate, displayedComponents: .date)
+                        .datePickerStyle(GraphicalDatePickerStyle())
+                        .frame(height: 300)
+                    
+                    // Time Picker
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Time")
+                            .font(.system(size: 17, weight: .semibold))
+                            .padding(.top, 20)
+                        
+                        DatePicker("", selection: $selectedTime, displayedComponents: .hourAndMinute)
+                            .datePickerStyle(WheelDatePickerStyle())
+                            .labelsHidden()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(height: 100)
+                            .clipped()
+                    }
+                }
+                .padding(.horizontal, 24)
+            }
+            
+            // Next button
+            Button(action: {
+                currentStep += 1
+            }) {
+                Text("Next")
+                    .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 53)
+                    .background(Color(red: 0.06, green: 0.36, blue: 0.22))
+                    .cornerRadius(8)
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 20)
+        }
     }
 }
 
