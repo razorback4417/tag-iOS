@@ -36,11 +36,13 @@ import Firebase
 struct testingApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var userViewModel = UserViewModel()
+    @StateObject private var tripViewModel = TripViewModel()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(userViewModel)
+                .environmentObject(tripViewModel)
         }
     }
 }

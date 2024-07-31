@@ -7,13 +7,26 @@
 import SwiftUI
 
 struct SearchView: View {
+    @EnvironmentObject var userViewModel: UserViewModel
+    @EnvironmentObject var tripViewModel: TripViewModel
+    
     @State private var pickupLocation = ""
     @State private var destination = ""
-    @State private var date = ""
-    @State private var time = ""
+    
+    @State private var date = Date()
     
     @State private var showMyTrips = false
     @State private var showActiveTrips = false
+    @State private var showSearchResults = false
+    
+    
+    @State private var navigateToActiveTrips = false
+    
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, yyyy"
+        return formatter
+    }()
     
     var body: some View {
         NavigationStack {
@@ -93,31 +106,25 @@ struct SearchView: View {
                             .background(Color.white)
                             .cornerRadius(8)
                             
-                            HStack(spacing: 12) {
-                                HStack {
-                                    Image(systemName: "calendar")
-                                        .foregroundColor(.gray)
-                                    TextField("Date", text: $date)
-                                        .font(.custom("Be Vietnam Pro", size: 16))
-                                }
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
-                                
-                                HStack {
-                                    Image(systemName: "clock")
-                                        .foregroundColor(.gray)
-                                    TextField("Time", text: $time)
-                                        .font(.custom("Be Vietnam Pro", size: 16))
-                                }
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
+                            HStack {
+                                Image(systemName: "calendar")
+                                    .foregroundColor(.gray)
+                                DatePicker("", selection: $date, displayedComponents: .date)
+                                    .labelsHidden()
+                                    .font(.custom("Be Vietnam Pro", size: 16))
+                                Spacer()
+                                Text(dateFormatter.string(from: date))
+                                    .font(.custom("Be Vietnam Pro", size: 16))
+                                    .foregroundColor(.gray)
                             }
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(8)
                         }
                         
                         Button(action: {
-                            showActiveTrips = true
+                            print("Searching now")
+                            performSearch()
                         }) {
                             Text("Search")
                                 .font(.custom("Be Vietnam Pro", size: 16).weight(.medium))
@@ -147,6 +154,10 @@ struct SearchView: View {
                     .padding(.horizontal)
                     
                     Spacer()
+                    
+                    NavigationLink(destination: ActiveTripsView().environmentObject(tripViewModel), isActive: $navigateToActiveTrips) {
+                       EmptyView()
+                   }
                 }
                 .padding(.top, 60)
             }
@@ -155,14 +166,43 @@ struct SearchView: View {
             }
             .navigationDestination(isPresented: $showMyTrips) {
                 MyTripsView()
+                    .environmentObject(userViewModel)
             }
         }
+    }
+    private func performSearch() {
+        print("Performing Search")
+        print("Pickup Location: '\(pickupLocation)'")
+        print("Destination: '\(destination)'")
+        print("Date: \(dateFormatter.string(from: date))")
+        tripViewModel.searchTrips(from: pickupLocation, to: destination)
+        print("Search initiated")
+        
+        // Navigate immediately
+        DispatchQueue.main.async {
+            self.navigateToActiveTrips = true
+        }
+    }
+}
+
+struct SearchResultsView: View {
+    let trips: [TripInfo]
+    
+    var body: some View {
+        List(trips) { trip in
+            NavigationLink(destination: TripDetailsView(isFromActiveTrips: true, trip: trip)) {
+                TripCard(trip: trip)
+            }
+        }
+        .navigationTitle("Search Results")
     }
 }
 
 struct SearchView_Previews: PreviewProvider {
     static var previews: some View {
         SearchView()
+            .environmentObject(UserViewModel())
+            .environmentObject(TripViewModel())
     }
 }
 

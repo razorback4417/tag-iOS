@@ -6,14 +6,24 @@
 //
 
 import Foundation
+import FirebaseFirestoreSwift
 
-struct TripInfo: Identifiable {
-    let id = UUID()
+struct TripInfo: Identifiable, Codable {
+    @DocumentID var id: String?
+    let hostId: String
     let from: String
     let to: String
-    let date: String
+    let date: Date
+    var joinedUsers: [String]
+    let totalSpots: Int
     let distance: String
     let price: String
-    let spots: String
-    // Add any additional properties needed for TripDetailsView
+    
+    var availableSpots: Int {
+        return totalSpots - joinedUsers.count
+    }
+    
+    var spots: String {
+        return "\(joinedUsers.count + 1)/\(totalSpots) spots"
+    }
 }
