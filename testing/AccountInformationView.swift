@@ -102,13 +102,6 @@ struct AccountInformationView: View {
     }
 }
 
-
-//struct Account_Preview: PreviewProvider {
-//    static var previews: some View {
-//        AccountInformationView()
-//    }
-//}
-
 struct Account_Preview: PreviewProvider {
     static var previews: some View {
         let mockViewModel = UserViewModel()

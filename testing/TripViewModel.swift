@@ -9,18 +9,6 @@ import Foundation
 import Firebase
 import FirebaseFirestore
 
-//class TripViewModel: ObservableObject {
-//    private var db = Firestore.firestore()
-//    
-//    func createTrip(_ trip: TripInfo) {
-//        do {
-//            _ = try db.collection("trips").addDocument(from: trip)
-//        } catch {
-//            print("Error creating trip: \(error.localizedDescription)")
-//        }
-//    }
-//}
-
 class TripViewModel: ObservableObject {
     private var db = Firestore.firestore()
     @Published var trips: [TripInfo] = []

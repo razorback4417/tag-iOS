@@ -120,41 +120,9 @@ struct SearchView: View {
                             .padding()
                             .background(Color.white)
                             .cornerRadius(8)
-                            
-//                            HStack(spacing: 12) {
-//                                HStack {
-//                                    Image(systemName: "calendar")
-//                                        .foregroundColor(.gray)
-//                                    DatePicker("", selection: $date, displayedComponents: .date)
-//                                        .labelsHidden()
-//                                        .font(.custom("Be Vietnam Pro", size: 16))
-//                                }
-//                                .padding()
-//                                .background(Color.white)
-//                                .cornerRadius(8)
-//                                
-//                                HStack {
-//                                    Image(systemName: "clock")
-//                                        .foregroundColor(.gray)
-//                                    DatePicker("", selection: $time, displayedComponents: .hourAndMinute)
-//                                        .labelsHidden()
-//                                        .font(.custom("Be Vietnam Pro", size: 16))
-//                                }
-//                                .padding()
-//                                .background(Color.white)
-//                                .cornerRadius(8)
-//                            }
-//                            if !tripViewModel.searchResults.isEmpty {
-//                                Text("Search Results:")
-//                                List(tripViewModel.searchResults) { trip in
-//                                    Text("\(trip.from) to \(trip.to) on \(trip.date)")
-//                                }
-//                            }
                         }
                         
                         Button(action: {
-//                            print("Navigating to my trips")
-//                            showActiveTrips = true
                             print("Searching now")
                             performSearch()
                         }) {
@@ -202,43 +170,11 @@ struct SearchView: View {
             }
         }
     }
-//    private func performSearch() {
-//        print("Performing Search")
-//        print("TripViewModel: \(tripViewModel)")
-//        print("Pickup Location: '\(pickupLocation)'")
-//        print("Destination: '\(destination)'")
-//        print("Date: \(dateFormatter.string(from: date))")
-//        
-//        // Check if inputs are not empty
-//        guard !pickupLocation.isEmpty, !destination.isEmpty else {
-//            print("Error: Pickup location or destination is empty")
-//            return
-//        }
-//        
-//        tripViewModel.searchTrips(from: pickupLocation, to: destination)
-//        print("Search initiated")
-//        
-//        // Add a delay and then check results
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//            print("Search Results Count: \(self.tripViewModel.searchResults.count)")
-//            print("Search Results: \(self.tripViewModel.searchResults)")
-//            
-//            if !self.tripViewModel.searchResults.isEmpty {
-//                self.navigateToActiveTrips = true
-//            }
-//        }
-//    }
     private func performSearch() {
         print("Performing Search")
         print("Pickup Location: '\(pickupLocation)'")
         print("Destination: '\(destination)'")
         print("Date: \(dateFormatter.string(from: date))")
-        
-//        guard !pickupLocation.isEmpty, !destination.isEmpty else {
-//            print("Error: Pickup location or destination is empty")
-//            return
-//        }
-        
         tripViewModel.searchTrips(from: pickupLocation, to: destination)
         print("Search initiated")
         
