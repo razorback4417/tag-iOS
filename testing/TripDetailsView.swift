@@ -15,6 +15,9 @@ struct TripDetailsView: View {
     @EnvironmentObject var userViewModel: UserViewModel
     @EnvironmentObject var tripViewModel: TripViewModel
     @State private var showingDeleteConfirmation = false
+    @State private var showingJoinedUsers = false
+    @State private var hostName = ""
+    @State private var joinedUserNames: [String] = []
 
     var body: some View {
         VStack(spacing: 20) {
@@ -67,7 +70,7 @@ struct TripDetailsView: View {
                     }
                     Spacer()
                     VStack {
-                        Text("Duration 1h 05m") // You might want to calculate this dynamically
+                        Text("Duration 1h 05m")
                             .font(.custom("BeVietnamPro-Regular", size: 6))
                         Image(systemName: "car.fill")
                             .resizable()
@@ -88,13 +91,24 @@ struct TripDetailsView: View {
                 // Trip details grid
                 HStack(alignment: .top, spacing: 77) {
                     VStack(alignment: .leading, spacing: 5) {
-                        DetailRow(title: "Trip Owner", value: trip.hostId)
+                        DetailRow(title: "Trip Owner", value: hostName)
                         DetailRow(title: "Passengers", value: "\(trip.joinedUsers.count)/\(trip.totalSpots) students")
                         DetailRow(title: "Deadline", value: formatDate(trip.date.addingTimeInterval(-86400))) // 1 day before
                     }
                     VStack(alignment: .leading, spacing: 5) {
                         DetailRow(title: "Price Estimate", value: trip.price)
                         DetailRow(title: "Trip Status", value: "Active")
+                    }
+                }
+
+                // Joined Users Section
+                if canViewJoinedUsers {
+                    Button(action: {
+                        showingJoinedUsers = true
+                    }) {
+                        Text("View Joined Users")
+                            .font(.custom("BeVietnamPro-Regular", size: 14).weight(.medium))
+                            .foregroundColor(.blue)
                     }
                 }
             }
@@ -174,7 +188,35 @@ struct TripDetailsView: View {
         .background(Color(red: 0.94, green: 0.94, blue: 0.94))
         .edgesIgnoringSafeArea(.all)
         .navigationBarHidden(true)
+        .onAppear {
+            fetchHostName()
+            fetchJoinedUserNames()
+        }
+        .sheet(isPresented: $showingJoinedUsers) {
+            JoinedUsersView(joinedUserIds: trip.joinedUsers)
+                .environmentObject(userViewModel)
+        }
     }
+
+    private var canViewJoinedUsers: Bool {
+        let currentUserId = Auth.auth().currentUser?.uid
+        return trip.hostId == currentUserId || trip.joinedUsers.contains(currentUserId ?? "")
+    }
+
+    private func fetchHostName() {
+        userViewModel.fetchUserName(userId: trip.hostId) { name in
+            self.hostName = name
+        }
+    }
+
+    private func fetchJoinedUserNames() {
+        if canViewJoinedUsers {
+            userViewModel.fetchUserNames(userIds: trip.joinedUsers) { names in
+                self.joinedUserNames = names
+            }
+        }
+    }
+
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
@@ -192,6 +234,37 @@ struct TripDetailsView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEE, MMM d"
         return formatter.string(from: date)
+    }
+}
+
+struct JoinedUsersView: View {
+    @EnvironmentObject var userViewModel: UserViewModel
+    let joinedUserIds: [String]
+    @State private var joinedUserNames: [String] = []
+    @State private var isLoading = true
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ProgressView()
+            } else if joinedUserNames.isEmpty {
+                Text("No users have joined this trip yet.")
+            } else {
+                List(joinedUserNames, id: \.self) { name in
+                    Text(name)
+                }
+            }
+        }
+        .navigationTitle("Joined Users")
+        .onAppear(perform: loadUserNames)
+    }
+
+    private func loadUserNames() {
+        isLoading = true
+        userViewModel.fetchUserNames(userIds: joinedUserIds) { names in
+            self.joinedUserNames = names
+            self.isLoading = false
+        }
     }
 }
 
