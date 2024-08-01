@@ -60,6 +60,7 @@
 		54B790012C2E242200CEEFED /* testingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B790002C2E242200CEEFED /* testingTests.swift */; };
 		54B7900B2C2E242200CEEFED /* testingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B7900A2C2E242200CEEFED /* testingUITests.swift */; };
 		54B7900D2C2E242200CEEFED /* testingUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B7900C2C2E242200CEEFED /* testingUITestsLaunchTests.swift */; };
+		54F4B4912C5B8C5100B1BE31 /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F4B4902C5B8C5100B1BE31 /* UserProfileView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -130,6 +131,7 @@
 		54B790062C2E242200CEEFED /* testingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = testingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		54B7900A2C2E242200CEEFED /* testingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testingUITests.swift; sourceTree = "<group>"; };
 		54B7900C2C2E242200CEEFED /* testingUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testingUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		54F4B4902C5B8C5100B1BE31 /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -254,6 +256,7 @@
 				54172D8A2C4C481B00198E7D /* AppDelegate.swift */,
 				54172D8D2C4C79E100198E7D /* UserViewModel.swift */,
 				54172D912C4EFD0D00198E7D /* TripViewModel.swift */,
+				54F4B4902C5B8C5100B1BE31 /* UserProfileView.swift */,
 			);
 			path = testing;
 			sourceTree = "<group>";
@@ -460,6 +463,7 @@
 				548997912C4B07F300F8EE66 /* SearchView.swift in Sources */,
 				54172D7A2C4BC09B00198E7D /* TripInfo.swift in Sources */,
 				54172D922C4EFD0D00198E7D /* TripViewModel.swift in Sources */,
+				54F4B4912C5B8C5100B1BE31 /* UserProfileView.swift in Sources */,
 				548997872C42860B00F8EE66 /* HomeView.swift in Sources */,
 				54172D782C4BC04D00198E7D /* TripDetailsView.swift in Sources */,
 				54172D722C4BA22600198E7D /* MyTripsView.swift in Sources */,

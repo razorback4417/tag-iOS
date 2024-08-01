@@ -193,8 +193,10 @@ struct TripDetailsView: View {
             fetchJoinedUserNames()
         }
         .sheet(isPresented: $showingJoinedUsers) {
-            JoinedUsersView(joinedUserIds: trip.joinedUsers)
-                .environmentObject(userViewModel)
+            NavigationView {
+                JoinedUsersView(joinedUserIds: trip.joinedUsers)
+                    .environmentObject(userViewModel)
+            }
         }
     }
 
@@ -250,8 +252,10 @@ struct JoinedUsersView: View {
             } else if joinedUserNames.isEmpty {
                 Text("No users have joined this trip yet.")
             } else {
-                List(joinedUserNames, id: \.self) { name in
-                    Text(name)
+                List(joinedUserIds.indices, id: \.self) { index in
+                    NavigationLink(destination: UserProfileView(userId: joinedUserIds[index])) {
+                        Text(joinedUserNames[index])
+                    }
                 }
             }
         }
