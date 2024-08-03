@@ -200,6 +200,56 @@ class UserViewModel: ObservableObject {
     }
 }
 
+extension UserViewModel {
+    func fetchUserName(userId: String, completion: @escaping (String) -> Void) {
+        db.collection("users").document(userId).getDocument { document, error in
+            if let document = document, document.exists {
+                let firstName = document.get("firstName") as? String ?? ""
+                let lastName = document.get("lastName") as? String ?? ""
+                completion("\(firstName) \(lastName)")
+            } else {
+                completion("Unknown User")
+            }
+        }
+    }
+
+    func fetchUserNames(userIds: [String], completion: @escaping ([String]) -> Void) {
+        let group = DispatchGroup()
+        var names: [String] = []
+
+        for userId in userIds {
+            group.enter()
+            fetchUserName(userId: userId) { name in
+                names.append(name)
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) {
+            completion(names)
+        }
+    }
+}
+
+extension UserViewModel {
+    func fetchUserProfile(userId: String, completion: @escaping (Result<User, Error>) -> Void) {
+        db.collection("users").document(userId).getDocument { document, error in
+            if let error = error {
+                completion(.failure(error))
+            } else if let document = document, document.exists {
+                do {
+                    let user = try document.data(as: User.self)
+                    completion(.success(user))
+                } catch {
+                    completion(.failure(error))
+                }
+            } else {
+                completion(.failure(NSError(domain: "UserViewModel", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not found"])))
+            }
+        }
+    }
+}
+
 struct RegistrationData {
     var step1: RegistrationStep1Data?
     var step2: RegistrationStep2Data?

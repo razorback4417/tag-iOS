@@ -42,6 +42,9 @@ struct ActiveTripsView: View {
                         }
                     }
                 }
+                Text("Can't Find a Trip? Create one here.")
+                    .font(.custom("BeVietnamPro-Regular", size: 10))
+                    .padding(.top, 20)
             }
         }
         .navigationBarHidden(true)
