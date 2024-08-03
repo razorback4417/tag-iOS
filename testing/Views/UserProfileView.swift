@@ -50,7 +50,7 @@ struct UserProfileView: View {
                                 .foregroundColor(.gray)
                             HStack {
                                 Image(systemName: "calendar")
-                                Text("Join Date: 7/10/2024") // You might want to add this field to your User model
+                                Text("Join Date: 7/10/2024") // may add to User model
                                     .font(.system(size: 12))
                                     .foregroundColor(.gray)
                             }

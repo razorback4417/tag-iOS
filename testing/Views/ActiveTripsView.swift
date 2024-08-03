@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ActiveTripsView: View {
     @Environment(\.dismiss) var dismiss
-//    @StateObject private var tripViewModel = TripViewModel()
     @EnvironmentObject var tripViewModel: TripViewModel
     
     var body: some View {

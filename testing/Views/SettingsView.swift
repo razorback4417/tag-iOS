@@ -79,7 +79,6 @@ struct SettingsSection: View {
                     HStack {
                         Image(systemName: item.icon)
                             .frame(width: 20, height: 20)
-//                            .foregroundColor(.green)
                         Text(item.title)
                             .font(.system(size: 15))
                         Spacer()
