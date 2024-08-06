@@ -23,7 +23,8 @@
 		54172D902C4D19AB00198E7D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 54172D8F2C4D19AB00198E7D /* GoogleService-Info.plist */; };
 		54172D922C4EFD0D00198E7D /* TripViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54172D912C4EFD0D00198E7D /* TripViewModel.swift */; };
 		5472DE572C5EA7E6000FC4B5 /* PlaceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5472DE562C5EA7E6000FC4B5 /* PlaceViewModel.swift */; };
-		5472DE5B2C5EAD42000FC4B5 /* GooglePlaces in Frameworks */ = {isa = PBXBuildFile; productRef = 5472DE5A2C5EAD42000FC4B5 /* GooglePlaces */; };
+		5484B4262C61DAB400CDF4E9 /* GooglePlaces in Frameworks */ = {isa = PBXBuildFile; productRef = 5484B4252C61DAB400CDF4E9 /* GooglePlaces */; };
+		5484B4282C61DE4300CDF4E9 /* RideHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5484B4272C61DE4300CDF4E9 /* RideHistoryView.swift */; };
 		548997032C41CD7800F8EE66 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548997022C41CD7800F8EE66 /* LoginView.swift */; };
 		548997602C42678D00F8EE66 /* BeVietnamPro-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5489974E2C42678D00F8EE66 /* BeVietnamPro-Light.ttf */; };
 		548997612C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5489974F2C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf */; };
@@ -94,6 +95,7 @@
 		54172D912C4EFD0D00198E7D /* TripViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripViewModel.swift; sourceTree = "<group>"; };
 		5472DE552C5E95DB000FC4B5 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5472DE562C5EA7E6000FC4B5 /* PlaceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceViewModel.swift; sourceTree = "<group>"; };
+		5484B4272C61DE4300CDF4E9 /* RideHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideHistoryView.swift; sourceTree = "<group>"; };
 		548997022C41CD7800F8EE66 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		5489974E2C42678D00F8EE66 /* BeVietnamPro-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BeVietnamPro-Light.ttf"; sourceTree = "<group>"; };
 		5489974F2C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BeVietnamPro-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
@@ -145,7 +147,7 @@
 			files = (
 				54172D852C4C45F000198E7D /* FirebaseFirestoreSwift in Frameworks */,
 				54172D7F2C4C45F000198E7D /* FirebaseAnalyticsSwift in Frameworks */,
-				5472DE5B2C5EAD42000FC4B5 /* GooglePlaces in Frameworks */,
+				5484B4262C61DAB400CDF4E9 /* GooglePlaces in Frameworks */,
 				54172D832C4C45F000198E7D /* FirebaseFirestore in Frameworks */,
 				54172D812C4C45F000198E7D /* FirebaseAuth in Frameworks */,
 				54172D7D2C4C45F000198E7D /* FirebaseAnalytics in Frameworks */,
@@ -302,6 +304,7 @@
 				54172D752C4BB6B300198E7D /* ActiveTripsView.swift */,
 				54172D772C4BC04D00198E7D /* TripDetailsView.swift */,
 				54F4B4902C5B8C5100B1BE31 /* UserProfileView.swift */,
+				5484B4272C61DE4300CDF4E9 /* RideHistoryView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -340,7 +343,7 @@
 				54172D822C4C45F000198E7D /* FirebaseFirestore */,
 				54172D842C4C45F000198E7D /* FirebaseFirestoreSwift */,
 				54172D862C4C45F000198E7D /* FirebaseStorage */,
-				5472DE5A2C5EAD42000FC4B5 /* GooglePlaces */,
+				5484B4252C61DAB400CDF4E9 /* GooglePlaces */,
 			);
 			productName = testing;
 			productReference = 54B78FEC2C2E242000CEEFED /* testing.app */;
@@ -496,6 +499,7 @@
 				548997912C4B07F300F8EE66 /* SearchView.swift in Sources */,
 				54172D7A2C4BC09B00198E7D /* TripInfo.swift in Sources */,
 				54172D922C4EFD0D00198E7D /* TripViewModel.swift in Sources */,
+				5484B4282C61DE4300CDF4E9 /* RideHistoryView.swift in Sources */,
 				5472DE572C5EA7E6000FC4B5 /* PlaceViewModel.swift in Sources */,
 				54F4B4912C5B8C5100B1BE31 /* UserProfileView.swift in Sources */,
 				548997872C42860B00F8EE66 /* HomeView.swift in Sources */,
@@ -891,7 +895,7 @@
 			package = 54172D7B2C4C45F000198E7D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
 		};
-		5472DE5A2C5EAD42000FC4B5 /* GooglePlaces */ = {
+		5484B4252C61DAB400CDF4E9 /* GooglePlaces */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5472DE582C5EA987000FC4B5 /* XCRemoteSwiftPackageReference "ios-places-sdk" */;
 			productName = GooglePlaces;

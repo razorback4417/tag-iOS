@@ -16,6 +16,8 @@ class TripViewModel: ObservableObject {
     
     @Published var searchResults: [TripInfo] = []
     
+    @Published var pastTrips: [TripInfo] = []
+    
     func createTrip(_ trip: TripInfo) {
         do {
             _ = try db.collection("trips").addDocument(from: trip)
@@ -53,6 +55,38 @@ class TripViewModel: ObservableObject {
                         self.objectWillChange.send()
                     }
                 }
+            }
+    }
+    
+    //note to self: add index at the https://console.firebase.google.com/
+    /*
+     from - as
+     to - as
+     date - as
+     __name__ - as
+     
+     -------
+     
+     joinedUsers - arrays
+     date - des
+     __name__ - des
+     */
+    func fetchPastTrips(for userId: String) {
+        print("in past trips")
+        let db = Firestore.firestore()
+        db.collection("trips")
+            .whereField("joinedUsers", arrayContains: userId)
+            .whereField("date", isLessThan: Date())
+            .order(by: "date", descending: true)
+            .getDocuments { (snapshot, error) in
+                if let error = error {
+                    print("Error fetching past trips: \(error)")
+                    return
+                }
+                
+                self.pastTrips = snapshot?.documents.compactMap { document -> TripInfo? in
+                    try? document.data(as: TripInfo.self)
+                } ?? []
             }
     }
     

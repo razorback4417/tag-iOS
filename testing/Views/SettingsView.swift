@@ -10,6 +10,8 @@ struct SettingsView: View {
     @State private var showAccountInfo = false
     @EnvironmentObject var userViewModel: UserViewModel
     
+    @State private var showRideHistory = false
+    
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -22,8 +24,8 @@ struct SettingsView: View {
                     
                     SettingsSection(title: "General", items: [
                         SettingsItem(icon: "gearshape", title: "Account information", action: { showAccountInfo = true }),
+                        SettingsItem(icon: "clock", title: "Ride History", action: { showRideHistory = true }),
                         SettingsItem(icon: "creditcard", title: "Payment methods"),
-                        SettingsItem(icon: "clock", title: "Ride History"),
                         SettingsItem(icon: "person.2", title: "Friends")
                     ])
                     
@@ -60,6 +62,11 @@ struct SettingsView: View {
             AccountInformationView()
                 .environmentObject(userViewModel)
         }
+        .background(
+            NavigationLink(destination: RideHistoryView(), isActive: $showRideHistory) {
+                EmptyView()
+            }
+        )
     }
 }
 

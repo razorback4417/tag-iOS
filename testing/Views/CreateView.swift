@@ -107,8 +107,8 @@ struct CreateView: View {
             from: pickupLocation,
             to: destination,
             date: combinedDateTime,
-            joinedUsers: [],
-            totalSpots: 4,  // You can make this configurable if needed
+            joinedUsers: [userId],  // include host
+            totalSpots: 4,  // update to be able to support "party" size
             distance: "N/A",
             price: "N/A"
         )

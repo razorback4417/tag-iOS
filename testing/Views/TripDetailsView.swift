@@ -18,6 +18,7 @@ struct TripDetailsView: View {
     @State private var showingJoinedUsers = false
     @State private var hostName = ""
     @State private var joinedUserNames: [String] = []
+    @State private var showHostProfile = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -44,9 +45,9 @@ struct TripDetailsView: View {
 
             // Trip details card
             VStack(alignment: .leading, spacing: 20) {
-                Text(trip.distance) //to be calculated
-                    .font(.custom("BeVietnamPro-Regular", size: 12))
-                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+//                Text(trip.distance)
+//                    .font(.custom("BeVietnamPro-Regular", size: 12))
+//                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                 
                 HStack {
                     Text("\(trip.from) → \(trip.to)")
@@ -92,6 +93,12 @@ struct TripDetailsView: View {
                 HStack(alignment: .top, spacing: 77) {
                     VStack(alignment: .leading, spacing: 5) {
                         DetailRow(title: "Trip Owner", value: hostName)
+                            .onTapGesture {
+                                showHostProfile = true
+                            }
+                            .sheet(isPresented: $showHostProfile) {
+                                UserProfileView(userId: trip.hostId)
+                            }
                         DetailRow(title: "Passengers", value: "\(trip.joinedUsers.count)/\(trip.totalSpots) students")
                         DetailRow(title: "Deadline", value: formatDate(trip.date.addingTimeInterval(-86400))) // 1 day before
                     }
