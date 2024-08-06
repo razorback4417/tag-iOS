@@ -70,10 +70,13 @@ struct AccountInformationView: View {
                     ForEach([
                         "School: \(userViewModel.user?.school ?? "")",
                         "Major: \(userViewModel.user?.major ?? "")",
+                        "Phone: \(userViewModel.user?.phoneNumber ?? "")",
                         "Interests: \(userViewModel.user?.interests.joined(separator: ", ") ?? "")"
                     ], id: \.self) { item in
                         HStack {
-                            Image(systemName: item.hasPrefix("School") ? "building.columns" : (item.hasPrefix("Major") ? "book" : "star"))
+                            Image(systemName: item.hasPrefix("School") ? "building.columns" :
+                                             (item.hasPrefix("Major") ? "book" :
+                                             (item.hasPrefix("Phone") ? "phone.fill" : "star")))
                                 .foregroundColor(.white)
                                 .frame(width: 30, height: 30)
                                 .background(darkGreenColor)

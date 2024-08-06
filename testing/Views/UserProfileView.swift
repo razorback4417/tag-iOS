@@ -63,9 +63,16 @@ struct UserProfileView: View {
                     Text("General Info")
                         .font(.system(size: 18, weight: .bold))
                     
-                    ForEach(["School: \(user.school)", "Major: \(user.major)", "Interests: \(user.interests.joined(separator: ", "))"], id: \.self) { item in
+                    ForEach([
+                        "School: \(user.school)",
+                        "Major: \(user.major)",
+                        "Phone: \(user.phoneNumber)",  // Add this line
+                        "Interests: \(user.interests.joined(separator: ", "))"
+                    ], id: \.self) { item in
                         HStack {
-                            Image(systemName: item.hasPrefix("School") ? "building.columns" : (item.hasPrefix("Major") ? "book" : "star"))
+                            Image(systemName: item.hasPrefix("School") ? "building.columns" :
+                                             (item.hasPrefix("Major") ? "book" :
+                                             (item.hasPrefix("Phone") ? "phone.fill" : "star")))
                                 .foregroundColor(.white)
                                 .frame(width: 30, height: 30)
                                 .background(Color(red: 0.06, green: 0.36, blue: 0.22))
