@@ -143,18 +143,18 @@ struct Step1View: View {
                         
                         SelectionButton(title: "Friends", subtitle: "Create a private trip with an invite code to send out", isSelected: selection == "Friends", action: { selection = "Friends" })
                     }
-            .padding(.horizontal, 24) // Increase horizontal padding
+            .padding(.horizontal, 24)
 
-            if selection == "Just me", let user = userViewModel.user {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Host Information")
-                        .font(.headline)
-                    
-                    Text("Name: \(user.firstName) \(user.lastName)")
-                    Text("Phone: \(user.phoneNumber)")
-                }
-                .padding(.horizontal, 24)
-            }
+//            if selection == "Just me", let user = userViewModel.user {
+//                VStack(alignment: .leading, spacing: 10) {
+//                    Text("Host Information")
+//                        .font(.headline)
+//                    
+//                    Text("Name: \(user.firstName) \(user.lastName)")
+//                    Text("Phone: \(user.phoneNumber)")
+//                }
+//                .padding(.horizontal, 24)
+//            }
             
             Spacer()
             
@@ -222,149 +222,140 @@ struct Step2View: View {
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
     @State private var pickupAnnotation: IdentifiablePointAnnotation?
     @State private var destinationAnnotation: IdentifiablePointAnnotation?
-    @State private var pickupSearchResults: [MKLocalSearchCompletion] = []
-    @State private var destinationSearchResults: [MKLocalSearchCompletion] = []
     @State private var showingPickupResults = false
     @State private var showingDestinationResults = false
-
-    let searchCompleter = MKLocalSearchCompleter()
-
+    
+    @StateObject private var placeViewModel = PlaceViewModel()
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // Header
-            VStack(alignment: .leading, spacing: 5) {
-                Text("02")
-                    .font(.system(size: 50, weight: .heavy))
-                    .foregroundColor(.black)
-                
-                Text("Where are you going?")
-                    .font(.system(size: 22, weight: .heavy))
-                    .foregroundColor(.black)
-                
-                Text("Select your pickup and drop-off location")
-                    .font(.custom("BeVietnamPro-Regular", size: 12))
-                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-            }
-            .padding(.top, 20)
-            .padding(.horizontal, 24)
+        ZStack(alignment: .top) {
             
-            VStack(spacing: 12) {
-                // Pickup location input
-                VStack {
+            Color.white.opacity(0.01) // Invisible background to catch taps
+                .onTapGesture {
+                    showingPickupResults = false
+                    showingDestinationResults = false
+                }
+
+            VStack(alignment: .leading, spacing: 20) {
+                // Header
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("02")
+                        .font(.system(size: 50, weight: .heavy))
+                        .foregroundColor(.black)
+                    
+                    Text("Where are you going?")
+                        .font(.system(size: 22, weight: .heavy))
+                        .foregroundColor(.black)
+                    
+                    Text("Select your pickup and drop-off location")
+                        .font(.custom("BeVietnamPro-Regular", size: 12))
+                        .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                }
+                .padding(.top, 20)
+                .padding(.horizontal, 24)
+                
+                VStack(spacing: 12) {
+                    // Pickup location input
                     HStack {
                         Image(systemName: "paperplane")
                             .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                         TextField("Pickup location", text: $pickupLocation)
                             .font(.custom("BeVietnamPro-Regular", size: 14))
-                            .onChange(of: pickupLocation) { _, newValue in
-                                searchAddress(newValue, isPickup: true)
+                            .onChange(of: pickupLocation) { newValue in
+                                placeViewModel.searchAddress(newValue)
+                                showingPickupResults = true
+                                showingDestinationResults = false
                             }
                     }
                     .padding()
                     .background(Color(red: 0.95, green: 0.95, blue: 0.95))
                     .cornerRadius(8)
-                    
-                    if showingPickupResults {
-                        List(pickupSearchResults, id: \.self) { result in
-                            Text(result.title)
-                                .onTapGesture {
-                                    pickupLocation = result.title
-                                    showingPickupResults = false
-                                    updateAnnotation(for: result.title, isPickup: true)
-                                }
-                        }
-                        .frame(height: min(CGFloat(pickupSearchResults.count) * 44, 200))
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(radius: 5)
-                    }
-                }
 
-                // Destination input
-                VStack {
+                    // Destination input
                     HStack {
                         Image(systemName: "mappin.and.ellipse")
                             .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                         TextField("Destination", text: $destination)
                             .font(.custom("BeVietnamPro-Regular", size: 14))
-                            .onChange(of: destination) { _, newValue in
-                                searchAddress(newValue, isPickup: false)
+                            .onChange(of: destination) { newValue in
+                                placeViewModel.searchAddress(newValue)
+                                showingDestinationResults = true
+                                showingPickupResults = false
                             }
                     }
                     .padding()
                     .background(Color(red: 0.95, green: 0.95, blue: 0.95))
                     .cornerRadius(8)
-                    
-                    if showingDestinationResults {
-                        List(destinationSearchResults, id: \.self) { result in
-                            Text(result.title)
-                                .onTapGesture {
-                                    destination = result.title
-                                    showingDestinationResults = false
-                                    updateAnnotation(for: result.title, isPickup: false)
-                                }
-                        }
-                        .frame(height: min(CGFloat(destinationSearchResults.count) * 44, 200))
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(radius: 5)
-                    }
                 }
+                .padding(.horizontal, 24)
+                
+                // Map
+                Map(coordinateRegion: $region, annotationItems: [pickupAnnotation, destinationAnnotation].compactMap { $0 }) { item in
+                    MapMarker(coordinate: item.annotation.coordinate, tint: item.annotation == pickupAnnotation?.annotation ? .blue : .red)
+                }
+                .frame(height: 250)
+                .cornerRadius(8)
+                .padding(.horizontal, 24)
+                
+                Spacer()
+                
+                // Next button
+                Button(action: {
+                    currentStep += 1
+                }) {
+                    Text("Next")
+                        .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 53)
+                        .background(Color(red: 0.06, green: 0.36, blue: 0.22))
+                        .cornerRadius(8)
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 20)
             }
-            .padding(.horizontal, 24)
             
-            // Map
-            Map(coordinateRegion: $region, annotationItems: [pickupAnnotation, destinationAnnotation].compactMap { $0 }) { item in
-                MapMarker(coordinate: item.annotation.coordinate, tint: item.annotation == pickupAnnotation?.annotation ? .blue : .red)
+            // Predictions overlay
+            VStack {
+                Spacer().frame(height: 210)
+                if showingPickupResults && !placeViewModel.places.isEmpty {
+                    predictionsListView(for: .pickup)
+//                        .offset(y: 145)
+                } else if showingDestinationResults && !placeViewModel.places.isEmpty {
+                    predictionsListView(for: .destination)
+//                        .offset(y: 205) // Adjust this value to position the list correctly
+                }
+                Spacer()
             }
-            .frame(height: 250)
-            .cornerRadius(8)
-            .padding(.horizontal, 24)
-            
-            Spacer()
-            
-            // Next button
-            Button(action: {
-                currentStep += 1
-            }) {
-                Text("Next")
-                    .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 53)
-                    .background(Color(red: 0.06, green: 0.36, blue: 0.22))
-                    .cornerRadius(8)
-            }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 20)
-        }
-        .onAppear {
-            searchCompleter.delegate = SearchCompleterDelegate(
-                pickupResults: $pickupSearchResults,
-                destinationResults: $destinationSearchResults
-            )
+            .zIndex(1)
         }
     }
     
-    private func searchAddress(_ query: String, isPickup: Bool) {
-        if query.isEmpty {
-            if isPickup {
-                showingPickupResults = false
-            } else {
-                showingDestinationResults = false
-            }
-            return
+    @ViewBuilder
+    func predictionsListView(for type: PredictionType) -> some View {
+        List(placeViewModel.places) { place in
+            Text(place.name)
+                .onTapGesture {
+                    if type == .pickup {
+                        pickupLocation = place.name
+                        showingPickupResults = false
+                    } else {
+                        destination = place.name
+                        showingDestinationResults = false
+                    }
+                    updateAnnotation(for: place.name, isPickup: type == .pickup)
+                }
         }
-        
-        searchCompleter.queryFragment = query
-        
-        if isPickup {
-            showingPickupResults = true
-            showingDestinationResults = false
-        } else {
-            showingDestinationResults = true
-            showingPickupResults = false
-        }
+        .frame(maxHeight: 200)
+        .background(Color.white)
+        .cornerRadius(8)
+        .shadow(radius: 3)
+        .padding(.horizontal, 24)
+    }
+    
+    enum PredictionType {
+        case pickup
+        case destination
     }
     
     private func updateAnnotation(for address: String, isPickup: Bool) {
@@ -374,12 +365,14 @@ struct Step2View: View {
                 let annotation = MKPointAnnotation()
                 annotation.coordinate = location.coordinate
                 let identifiableAnnotation = IdentifiablePointAnnotation(annotation: annotation)
-                if isPickup {
-                    pickupAnnotation = identifiableAnnotation
-                } else {
-                    destinationAnnotation = identifiableAnnotation
+                DispatchQueue.main.async {
+                    if isPickup {
+                        self.pickupAnnotation = identifiableAnnotation
+                    } else {
+                        self.destinationAnnotation = identifiableAnnotation
+                    }
+                    self.updateRegion()
                 }
-                updateRegion()
             }
         }
     }
@@ -635,3 +628,6 @@ struct CreateView_Previews: PreviewProvider {
             .environmentObject(TripViewModel())
     }
 }
+
+
+//

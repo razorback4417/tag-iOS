@@ -5,6 +5,7 @@
 //  Created by Theo L on 7/19/24.
 //
 import SwiftUI
+import MapKit
 
 struct SearchView: View {
     @EnvironmentObject var userViewModel: UserViewModel
@@ -12,15 +13,16 @@ struct SearchView: View {
     
     @State private var pickupLocation = ""
     @State private var destination = ""
-    
     @State private var date = Date()
     
     @State private var showMyTrips = false
     @State private var showActiveTrips = false
     @State private var showSearchResults = false
-    
-    
     @State private var navigateToActiveTrips = false
+    
+    @State private var showingPickupResults = false
+    @State private var showingDestinationResults = false
+    @StateObject private var placeViewModel = PlaceViewModel()
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -30,136 +32,205 @@ struct SearchView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
+            ZStack(alignment: .top) {
                 Color(red: 0.94, green: 0.94, blue: 0.94).edgesIgnoringSafeArea(.all)
                 
-                VStack(spacing: 20) {
-                    // Header
-                    HStack(alignment: .top, spacing: 12) {
-                        AsyncImage(url: URL(string: "https://i.ibb.co/SBnxXDB/Screenshot-2024-07-19-at-2-45-05-PM.png")) { phase in
-                            switch phase {
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 52, height: 52)
-                                    .clipShape(Circle())
-                            case .failure(_):
-                                Image(systemName: "person.circle.fill")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 52, height: 52)
-                                    .foregroundColor(.gray)
-                            case .empty:
-                                ProgressView()
-                                    .frame(width: 52, height: 52)
-                            @unknown default:
-                                EmptyView()
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Header
+                        HStack(alignment: .top, spacing: 12) {
+                            AsyncImage(url: URL(string: "https://i.ibb.co/SBnxXDB/Screenshot-2024-07-19-at-2-45-05-PM.png")) { phase in
+                                switch phase {
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 52, height: 52)
+                                        .clipShape(Circle())
+                                case .failure(_):
+                                    Image(systemName: "person.circle.fill")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 52, height: 52)
+                                        .foregroundColor(.gray)
+                                case .empty:
+                                    ProgressView()
+                                        .frame(width: 52, height: 52)
+                                @unknown default:
+                                    EmptyView()
+                                }
+                            }
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Hello Theo 👋")
+                                    .font(.custom("Be Vietnam Pro", size: 12))
+                                    .foregroundColor(.black)
+                                
+                                Text("Where are you going?")
+                                    .font(.custom("Be Vietnam Pro", size: 21).weight(.semibold))
+                                    .foregroundColor(.black)
+                            }
+                            
+                            Spacer()
+                            
+                            Image(systemName: "gearshape")
+                                .foregroundColor(.black)
+                                .frame(width: 24, height: 24)
+                                .padding(6)
+                                .background(Color.black.opacity(0.1))
+                                .clipShape(Circle())
+                        }
+                        .padding(.horizontal)
+                        
+                        // Trip Info Card
+                        VStack(spacing: 16) {
+                            Text("Trip-Info")
+                                .font(.custom("Manrope", size: 12).weight(.semibold))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.leading, 16)
+                            
+                            VStack(spacing: 12) {
+                                // Pickup location input
+                                locationInputField(title: "Pickup location", text: $pickupLocation, isPickup: true)
+                                
+//                                VStack {
+//                                    HStack {
+//                                        Image(systemName: "mappin.circle.fill")
+//                                            .foregroundColor(.gray)
+//                                        TextField("Pickup location", text: $pickupLocation)
+//                                            .font(.custom("Be Vietnam Pro", size: 16))
+//                                            .onChange(of: pickupLocation) { newValue in
+//                                                placeViewModel.searchAddress(newValue)
+//                                                showingPickupResults = true
+//                                                showingDestinationResults = false
+//                                            }
+//                                    }
+//                                    .padding()
+//                                    .background(Color.white)
+//                                    .cornerRadius(8)
+//                                    
+//                                    if showingPickupResults && !placeViewModel.places.isEmpty {
+//                                        List(placeViewModel.places) { place in
+//                                            Text(place.name)
+//                                                .onTapGesture {
+//                                                    pickupLocation = place.name
+//                                                    showingPickupResults = false
+//                                                }
+//                                        }
+//                                        .frame(height: min(CGFloat(placeViewModel.places.count) * 44, 200))
+//                                        .background(Color.white)
+//                                        .cornerRadius(8)
+//                                        .shadow(radius: 5)
+//                                    }
+//                                }
+                                
+                                // Destination input
+                                locationInputField(title: "Destination", text: $destination, isPickup: false)
+                                
+//                                VStack {
+//                                    HStack {
+//                                        Image(systemName: "mappin.and.ellipse")
+//                                            .foregroundColor(.gray)
+//                                        TextField("Destination", text: $destination)
+//                                            .font(.custom("Be Vietnam Pro", size: 16))
+//                                            .onChange(of: destination) { newValue in
+//                                                placeViewModel.searchAddress(newValue)
+//                                                showingDestinationResults = true
+//                                                showingPickupResults = false
+//                                            }
+//                                    }
+//                                    .padding()
+//                                    .background(Color.white)
+//                                    .cornerRadius(8)
+//                                    
+//                                    if showingDestinationResults && !placeViewModel.places.isEmpty {
+//                                        List(placeViewModel.places) { place in
+//                                            Text(place.name)
+//                                                .onTapGesture {
+//                                                    destination = place.name
+//                                                    showingDestinationResults = false
+//                                                }
+//                                        }
+//                                        .frame(height: min(CGFloat(placeViewModel.places.count) * 44, 200))
+//                                        .background(Color.white)
+//                                        .cornerRadius(8)
+//                                        .shadow(radius: 5)
+//                                    }
+//                                }
+                                
+                                HStack {
+                                    Image(systemName: "calendar")
+                                        .foregroundColor(.gray)
+                                    DatePicker("", selection: $date, displayedComponents: .date)
+                                        .labelsHidden()
+                                        .font(.custom("Be Vietnam Pro", size: 16))
+                                    Spacer()
+                                    Text(dateFormatter.string(from: date))
+                                        .font(.custom("Be Vietnam Pro", size: 16))
+                                        .foregroundColor(.gray)
+                                }
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(8)
+                            }
+                            
+                            Button(action: {
+                                print("Searching now")
+                                performSearch()
+                            }) {
+                                Text("Search")
+                                    .font(.custom("Be Vietnam Pro", size: 16).weight(.medium))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color(red: 0.06, green: 0.36, blue: 0.22))
+                                    .cornerRadius(8)
+                            }
+                            
+                            Button(action: {
+                                showMyTrips = true
+                            }) {
+                                Text("My Trips")
+                                    .font(.custom("Be Vietnam Pro", size: 16).weight(.medium))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color(red: 0.06, green: 0.36, blue: 0.22))
+                                    .cornerRadius(8)
                             }
                         }
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Hello Theo 👋")
-                                .font(.custom("Be Vietnam Pro", size: 12))
-                                .foregroundColor(.black)
-                            
-                            Text("Where are you going?")
-                                .font(.custom("Be Vietnam Pro", size: 21).weight(.semibold))
-                                .foregroundColor(.black)
-                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                        .padding(.horizontal)
                         
                         Spacer()
                         
-                        Image(systemName: "gearshape")
-                            .foregroundColor(.black)
-                            .frame(width: 24, height: 24)
-                            .padding(6)
-                            .background(Color.black.opacity(0.1))
-                            .clipShape(Circle())
+                        NavigationLink(destination: ActiveTripsView().environmentObject(tripViewModel), isActive: $navigateToActiveTrips) {
+                           EmptyView()
+                       }
                     }
-                    .padding(.horizontal)
-                    
-                    // Trip Info Card
-                    VStack(spacing: 16) {
-                        Text("Trip-Info")
-                            .font(.custom("Manrope", size: 12).weight(.semibold))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 16)
-                        
-                        VStack(spacing: 12) {
-                            HStack {
-                                Image(systemName: "mappin.circle.fill")
-                                    .foregroundColor(.gray)
-                                TextField("Pickup location", text: $pickupLocation)
-                                    .font(.custom("Be Vietnam Pro", size: 16))
-                            }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(8)
-                            
-                            HStack {
-                                Image(systemName: "mappin.and.ellipse")
-                                    .foregroundColor(.gray)
-                                TextField("Destination", text: $destination)
-                                    .font(.custom("Be Vietnam Pro", size: 16))
-                            }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(8)
-                            
-                            HStack {
-                                Image(systemName: "calendar")
-                                    .foregroundColor(.gray)
-                                DatePicker("", selection: $date, displayedComponents: .date)
-                                    .labelsHidden()
-                                    .font(.custom("Be Vietnam Pro", size: 16))
-                                Spacer()
-                                Text(dateFormatter.string(from: date))
-                                    .font(.custom("Be Vietnam Pro", size: 16))
-                                    .foregroundColor(.gray)
-                            }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(8)
-                        }
-                        
-                        Button(action: {
-                            print("Searching now")
-                            performSearch()
-                        }) {
-                            Text("Search")
-                                .font(.custom("Be Vietnam Pro", size: 16).weight(.medium))
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color(red: 0.06, green: 0.36, blue: 0.22))
-                                .cornerRadius(8)
-                        }
-                        
-                        Button(action: {
-                            showMyTrips = true
-                        }) {
-                            Text("My Trips")
-                                .font(.custom("Be Vietnam Pro", size: 16).weight(.medium))
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color(red: 0.06, green: 0.36, blue: 0.22))
-                                .cornerRadius(8)
-                        }
-                    }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(16)
-                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-                    .padding(.horizontal)
-                    
-                    Spacer()
-                    
-                    NavigationLink(destination: ActiveTripsView().environmentObject(tripViewModel), isActive: $navigateToActiveTrips) {
-                       EmptyView()
-                   }
+                    .padding(.top, 60)
                 }
-                .padding(.top, 60)
+                .simultaneousGesture(
+                    TapGesture().onEnded { _ in
+                        showingPickupResults = false
+                        showingDestinationResults = false
+                    }
+                )
+                
+                // Prediction results overlay
+                VStack {
+                    Spacer().frame(height: 240)
+                    if showingPickupResults {
+                        predictionResultsView(for: $pickupLocation, showResults: $showingPickupResults)
+                    } else if showingDestinationResults {
+                        predictionResultsView(for: $destination, showResults: $showingDestinationResults)
+                    }
+                    Spacer()
+                }
+                .zIndex(1)
+                
             }
             .navigationDestination(isPresented: $showActiveTrips) {
                 ActiveTripsView()
@@ -170,6 +241,56 @@ struct SearchView: View {
             }
         }
     }
+    func locationInputField(title: String, text: Binding<String>, isPickup: Bool) -> some View {
+        HStack {
+            Image(systemName: isPickup ? "mappin.circle.fill" : "mappin.and.ellipse")
+                .foregroundColor(.gray)
+            TextField(title, text: text)
+                .font(.custom("Be Vietnam Pro", size: 16))
+                .onChange(of: text.wrappedValue) { newValue in
+                    placeViewModel.searchAddress(newValue)
+                    if isPickup {
+                        showingPickupResults = true
+                        showingDestinationResults = false
+                    } else {
+                        showingDestinationResults = true
+                        showingPickupResults = false
+                    }
+                }
+        }
+        .padding()
+        .background(Color(red: 0.95, green: 0.95, blue: 0.95))
+        .cornerRadius(8)
+    }
+    
+    func predictionResultsView(for text: Binding<String>, showResults: Binding<Bool>) -> some View {
+        VStack {
+            if !placeViewModel.places.isEmpty {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(placeViewModel.places) { place in
+                        Text(place.name)
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 16)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.white)
+                            .onTapGesture {
+                                text.wrappedValue = place.name
+                                showResults.wrappedValue = false
+                            }
+                        
+                        if place.id != placeViewModel.places.last?.id {
+                            Divider()
+                        }
+                    }
+                }
+                .background(Color.white)
+                .cornerRadius(8)
+                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                .padding(.horizontal, 24)
+            }
+        }
+    }
+    
     private func performSearch() {
         print("Performing Search")
         print("Pickup Location: '\(pickupLocation)'")
@@ -205,5 +326,3 @@ struct SearchView_Previews: PreviewProvider {
             .environmentObject(TripViewModel())
     }
 }
-
-

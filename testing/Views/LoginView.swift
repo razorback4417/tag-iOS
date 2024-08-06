@@ -504,38 +504,6 @@ struct LoginView_Previews: PreviewProvider {
         LoginView()
     }
 }
-//
-//struct RegistrationView1_Previews: PreviewProvider {
-//    static var previews: some View {
-//        NavigationView {
-//            RegistrationView1()
-//        }
-//    }
-//}
-//
-//struct RegistrationView2_Previews: PreviewProvider {
-//    static var previews: some View {
-//        NavigationView {
-//            RegistrationView2()
-//        }
-//    }
-//}
-//
-//struct RegistrationView3_Previews: PreviewProvider {
-//    static var previews: some View {
-//        NavigationView {
-//            RegistrationView3()
-//        }
-//    }
-//}
-//
-//struct RegistrationConfirmView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        NavigationView {
-//            RegistrationConfirmView()
-//        }
-//    }
-//}
 
 struct RegistrationView1_Previews: PreviewProvider {
     @State static var previewPath = NavigationPath()
