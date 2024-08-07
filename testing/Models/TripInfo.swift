@@ -16,8 +16,12 @@ struct TripInfo: Identifiable, Codable {
     let date: Date
     var joinedUsers: [String]
     let totalSpots: Int
-    let distance: String
+    var distance: Double
     let price: String
+    let fromLatitude: Double
+    let fromLongitude: Double
+    let toLatitude: Double
+    let toLongitude: Double
     
     var availableSpots: Int {
         return totalSpots - joinedUsers.count

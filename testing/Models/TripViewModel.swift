@@ -8,6 +8,7 @@
 import Foundation
 import Firebase
 import FirebaseFirestore
+import CoreLocation
 
 class TripViewModel: ObservableObject {
     private var db = Firestore.firestore()
@@ -19,8 +20,18 @@ class TripViewModel: ObservableObject {
     @Published var pastTrips: [TripInfo] = []
     
     func createTrip(_ trip: TripInfo) {
+        let fromCoord = CLLocation(latitude: trip.fromLatitude, longitude: trip.fromLongitude)
+        let toCoord = CLLocation(latitude: trip.toLatitude, longitude: trip.toLongitude)
+        
+        let distanceInMeters = fromCoord.distance(from: toCoord)
+        let distanceInMiles = distanceInMeters / 1609.34
+        let roundedDistance = round(distanceInMiles * 10) / 10  // Round to nearest tenth
+        
+        var updatedTrip = trip
+        updatedTrip.distance = roundedDistance
+        
         do {
-            _ = try db.collection("trips").addDocument(from: trip)
+            _ = try db.collection("trips").addDocument(from: updatedTrip)
         } catch {
             print("Error creating trip: \(error.localizedDescription)")
         }
@@ -164,54 +175,59 @@ class TripViewModel: ObservableObject {
     
     func searchTrips(from: String, to: String) {
         print("TripViewModel: searchTrips called")
-        print("From: '\(from)', To: '\(to)',")
-        // Debug: Fetch all documents to verify data
+        print("From: '\(from)', To: '\(to)'")
         
-        db.collection("trips").getDocuments { (querySnapshot, error) in
-            if let error = error {
-                print("Error getting all documents: \(error)")
-            } else {
-                print("Total documents in 'trips': \(querySnapshot?.documents.count ?? 0)")
-                for doc in querySnapshot?.documents ?? [] {
-                    print("Document: \(doc.data())")
+        // Get coordinates for the 'from' and 'to' locations
+        getCoordinates(for: from) { fromCoordinates in
+            self.getCoordinates(for: to) { toCoordinates in
+                guard let fromCoord = fromCoordinates, let toCoord = toCoordinates else {
+                    print("Could not get coordinates for locations")
+                    return
+                }
+                
+                let query = self.db.collection("trips")
+                query.getDocuments(source: .default) { (querySnapshot, error) in
+                    if let error = error {
+                        print("Firestore error: \(error.localizedDescription)")
+                    } else {
+                        self.searchResults = querySnapshot?.documents.compactMap { document in
+                            do {
+                                var trip = try document.data(as: TripInfo.self)
+                                let tripFromCoord = CLLocation(latitude: trip.fromLatitude, longitude: trip.fromLongitude)
+                                let tripToCoord = CLLocation(latitude: trip.toLatitude, longitude: trip.toLongitude)
+                                
+                                let fromDistance = fromCoord.distance(from: tripFromCoord) / 1609.34 // Convert to miles
+                                let toDistance = toCoord.distance(from: tripToCoord) / 1609.34 // Convert to miles
+                                
+                                if fromDistance <= 2 && toDistance <= 2 {
+                                    trip.id = document.documentID
+                                    return trip
+                                }
+                                return nil
+                            } catch {
+                                print("Error decoding document: \(error)")
+                                return nil
+                            }
+                        } ?? []
+                        
+                        print("Search results updated. Count: \(self.searchResults.count)")
+                        DispatchQueue.main.async {
+                            self.objectWillChange.send()
+                        }
+                    }
                 }
             }
         }
-        
-        let query: Query = db.collection("trips")
-            .whereField("from", isEqualTo: from)
-            .whereField("to", isEqualTo: to)
-        
-        print("Executing Firestore query")
-        query.getDocuments { (querySnapshot, error) in
-            print("Firestore query completed")
-            if let error = error {
-                print("Firestore error: \(error.localizedDescription)")
-                if let firestoreError = error as NSError? {
-                    print("Error domain: \(firestoreError.domain)")
-                    print("Error code: \(firestoreError.code)")
-                }
-            } else {
-                print("Query successful. Number of documents: \(querySnapshot?.documents.count ?? 0)")
-                self.searchResults = querySnapshot?.documents.compactMap { document in
-                    do {
-                        var trip = try document.data(as: TripInfo.self)
-                        // Ensure the document ID is set
-                        trip.id = document.documentID
-                        print("Decoded trip: \(trip)")
-                        return trip
-                    } catch {
-                        print("Error decoding document: \(error)")
-                        print("Document data: \(document.data())")
-                        return nil
-                    }
-                } ?? []
-                
-                print("Search results updated. Count: \(self.searchResults.count)")
-                DispatchQueue.main.async {
-                    self.objectWillChange.send()
-                }
+    }
+    
+    private func getCoordinates(for address: String, completion: @escaping (CLLocation?) -> Void) {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(address) { placemarks, error in
+            guard let location = placemarks?.first?.location else {
+                completion(nil)
+                return
             }
+            completion(location)
         }
     }
 }

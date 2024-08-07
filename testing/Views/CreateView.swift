@@ -57,7 +57,7 @@ struct CreateView: View {
                     case 3:
                         Step3View(currentStep: $currentStep, selectedDate: $selectedDate, selectedTime: $selectedTime)
                     case 4:
-                        Step4View(currentStep: $currentStep, tripInfo: createTripInfo())
+                        Step4View(currentStep: $currentStep, createTripInfo: createTripInfo)
                     case 5:
                         Step5View(currentStep: $currentStep, onViewMyTrip: onViewMyTrip)
                     default:
@@ -88,13 +88,9 @@ struct CreateView: View {
         }
     }
     
-    private func createTripInfo() -> TripInfo? {
+    private func createTripInfo() async throws -> TripInfo {
         guard let user = userViewModel.user, let userId = user.id else {
-            DispatchQueue.main.async {
-                self.alertMessage = "User data not available. Please try again later."
-                self.showAlert = true
-            }
-            return nil
+            throw NSError(domain: "CreateView", code: 0, userInfo: [NSLocalizedDescriptionKey: "User data not available. Please try again later."])
         }
         
         let combinedDateTime = Calendar.current.date(bySettingHour: Calendar.current.component(.hour, from: selectedTime),
@@ -102,18 +98,37 @@ struct CreateView: View {
                                                      second: 0,
                                                      of: selectedDate) ?? selectedDate
         
-        return TripInfo(
-            hostId: userId,
-            from: pickupLocation,
-            to: destination,
-            date: combinedDateTime,
-            joinedUsers: [userId],  // include host
-            totalSpots: 4,  // update to be able to support "party" size
-            distance: "N/A",
-            price: "N/A"
-        )
-    }
-}
+        // Get coordinates for pickup and destination
+        let geocoder = CLGeocoder()
+        
+        do {
+            let fromLocations = try await geocoder.geocodeAddressString(pickupLocation)
+            let toLocations = try await geocoder.geocodeAddressString(destination)
+            
+            guard let fromCoord = fromLocations.first?.location?.coordinate,
+                  let toCoord = toLocations.first?.location?.coordinate else {
+                throw NSError(domain: "CreateView", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to get location coordinates. Please try again."])
+            }
+            
+            return TripInfo(
+                id: nil,  // Firebase will generate this
+                hostId: userId,
+                from: pickupLocation,
+                to: destination,
+                date: combinedDateTime,
+                joinedUsers: [userId],  // include host
+                totalSpots: 4,  // update to be able to support "party" size
+                distance: 0, // This will be calculated in the TripViewModel
+                price: "N/A",
+                fromLatitude: fromCoord.latitude,
+                fromLongitude: fromCoord.longitude,
+                toLatitude: toCoord.latitude,
+                toLongitude: toCoord.longitude
+            )
+        } catch {
+            throw NSError(domain: "CreateView", code: 2, userInfo: [NSLocalizedDescriptionKey: "Error geocoding addresses: \(error.localizedDescription)"])
+        }
+    }}
 
 struct Step1View: View {
     @Binding var currentStep: Int
@@ -476,13 +491,18 @@ struct Step3View: View {
 struct Step4View: View {
     @Binding var currentStep: Int
     @EnvironmentObject private var tripViewModel: TripViewModel
-    let tripInfo: TripInfo?
+    @State private var tripInfo: TripInfo?
     @State private var showAlert = false
     @State private var alertMessage = ""
+    @State private var isLoading = true
+    
+    let createTripInfo: () async throws -> TripInfo
     
     var body: some View {
         Group {
-            if let tripInfo = tripInfo {
+            if isLoading {
+                ProgressView("Creating trip...")
+            } else if let tripInfo = tripInfo {
                 VStack(alignment: .leading, spacing: 20) {
                     // Header
                     VStack(alignment: .leading, spacing: 5) {
@@ -538,6 +558,16 @@ struct Step4View: View {
         }
         .alert(isPresented: $showAlert) {
             Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+        }
+        .task {
+            do {
+                self.tripInfo = try await createTripInfo()
+                self.isLoading = false
+            } catch {
+                self.alertMessage = error.localizedDescription
+                self.showAlert = true
+                self.isLoading = false
+            }
         }
     }
     
