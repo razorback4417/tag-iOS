@@ -232,6 +232,7 @@
 		54B78FE32C2E242000CEEFED = {
 			isa = PBXGroup;
 			children = (
+				5472DE552C5E95DB000FC4B5 /* README.md */,
 				54172D8F2C4D19AB00198E7D /* GoogleService-Info.plist */,
 				54B78FEE2C2E242000CEEFED /* testing */,
 				54B78FFF2C2E242200CEEFED /* testingTests */,
@@ -261,7 +262,6 @@
 				54B78FF32C2E242200CEEFED /* Assets.xcassets */,
 				54B78FF52C2E242200CEEFED /* Preview Content */,
 				54172D8A2C4C481B00198E7D /* AppDelegate.swift */,
-				5472DE552C5E95DB000FC4B5 /* README.md */,
 			);
 			path = testing;
 			sourceTree = "<group>";
