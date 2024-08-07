@@ -118,7 +118,9 @@ struct SearchView: View {
                             
                             Button(action: {
                                 print("Searching now")
-                                performSearch()
+                                Task {
+                                    await performSearch()
+                                }
                             }) {
                                 Text("Search")
                                     .font(.custom("Be Vietnam Pro", size: 16).weight(.medium))
@@ -193,7 +195,7 @@ struct SearchView: View {
                 .foregroundColor(.gray)
             TextField(title, text: text)
                 .font(.custom("Be Vietnam Pro", size: 16))
-                .onChange(of: text.wrappedValue) { newValue in
+                .onChange(of: text.wrappedValue) { oldValue, newValue in
                     placeViewModel.searchAddress(newValue)
                     if isPickup {
                         showingPickupResults = true
@@ -237,12 +239,12 @@ struct SearchView: View {
         }
     }
     
-    private func performSearch() {
+    private func performSearch() async {
         print("Performing Search")
         print("Pickup Location: '\(pickupLocation)'")
         print("Destination: '\(destination)'")
         print("Date: \(dateFormatter.string(from: date))")
-        tripViewModel.searchTrips(from: pickupLocation, to: destination)
+        await tripViewModel.searchTrips(from: pickupLocation, to: destination)
         print("Search initiated")
         
         // Navigate immediately

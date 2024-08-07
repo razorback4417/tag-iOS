@@ -173,7 +173,7 @@ class TripViewModel: ObservableObject {
         }
     }
     
-    func searchTrips(from: String, to: String) {
+    func searchTrips(from: String, to: String) async {
         print("TripViewModel: searchTrips called")
         print("From: '\(from)', To: '\(to)'")
         

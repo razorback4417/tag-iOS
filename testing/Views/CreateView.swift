@@ -276,7 +276,7 @@ struct Step2View: View {
                             .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                         TextField("Pickup location", text: $pickupLocation)
                             .font(.custom("BeVietnamPro-Regular", size: 14))
-                            .onChange(of: pickupLocation) { newValue in
+                            .onChange(of: pickupLocation) { oldValue, newValue in
                                 placeViewModel.searchAddress(newValue)
                                 showingPickupResults = true
                                 showingDestinationResults = false
@@ -292,7 +292,7 @@ struct Step2View: View {
                             .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                         TextField("Destination", text: $destination)
                             .font(.custom("BeVietnamPro-Regular", size: 14))
-                            .onChange(of: destination) { newValue in
+                            .onChange(of: destination) { oldValue, newValue in
                                 placeViewModel.searchAddress(newValue)
                                 showingDestinationResults = true
                                 showingPickupResults = false
