@@ -229,6 +229,33 @@ extension UserViewModel {
             completion(names)
         }
     }
+    
+    func deleteAccount(completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            completion(.failure(NSError(domain: "UserViewModel", code: 0, userInfo: [NSLocalizedDescriptionKey: "No user logged in"])))
+            return
+        }
+        
+        let userId = user.uid
+        
+        // Delete user data from Firestore
+        db.collection("users").document(userId).delete { [weak self] error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            // Delete user authentication
+            user.delete { error in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    self?.signOut()
+                    completion(.success(()))
+                }
+            }
+        }
+    }
 }
 
 extension UserViewModel {
