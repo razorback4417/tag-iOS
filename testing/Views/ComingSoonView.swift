@@ -9,10 +9,17 @@ import SwiftUI
 
 struct ComingSoonView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            Color(red: 0.94, green: 0.94, blue: 0.94).edgesIgnoringSafeArea(.all)
+            
+            VStack(alignment: .leading, spacing: 20) {
+                    Text("Coming soon!")
+                        .font(.custom("BeVietnamPro-Regular", size: 16))
+                        .foregroundColor(.gray)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .padding()
+        }
+        .navigationTitle("Coming Soon")
     }
-}
-
-#Preview {
-    ComingSoonView()
 }

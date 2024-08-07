@@ -220,6 +220,21 @@ struct RegistrationView1: View {
                 .padding(.horizontal, 20)
                 
                 Spacer()
+                
+                Button(action: {
+                    // clear the navigation path to return to the root view (LoginView)
+                    path = NavigationPath()
+                }) {
+                    Text("Already have an account? Login ")
+                        .font(Font.custom("BeVietnamPro-Regular", size: 14))
+                        .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                    +
+                    Text("here.")
+                        .font(Font.custom("BeVietnamPro-Regular", size: 14).weight(.heavy))
+                        .foregroundColor(Color(red: 0.06, green: 0.36, blue: 0.22))
+                }
+                .padding(.bottom, 20)
+
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -301,10 +316,19 @@ struct RegistrationView2: View {
                 
                 Spacer()
                 
-                Text("Already have an account? Login here.")
-                    .font(Font.custom("BeVietnamPro-Regular", size: 14))
-                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-                    .padding(.bottom, 20)
+                Button(action: {
+                    // clear the navigation path to return to the root view (LoginView)
+                    path = NavigationPath()
+                }) {
+                    Text("Already have an account? Login ")
+                        .font(Font.custom("BeVietnamPro-Regular", size: 14))
+                        .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                    +
+                    Text("here.")
+                        .font(Font.custom("BeVietnamPro-Regular", size: 14).weight(.heavy))
+                        .foregroundColor(Color(red: 0.06, green: 0.36, blue: 0.22))
+                }
+                .padding(.bottom, 20)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -358,34 +382,40 @@ struct RegistrationView3: View {
                 
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Card number")
+                        Text("Preferred Payment Method")
                             .font(Font.custom("BeVietnamPro-Regular", size: 15))
                             .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-                        InputField(icon: "creditcard", placeholder: "0000 0000 0000 0000", text: $cardNumber)
+                        InputField(icon: "creditcard", placeholder: "Venmo, Zelle, Cashapp, etc.", text: $cardNumber)
                     }
-                    
-                    HStack(spacing: 20) {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("Expires")
-                                .font(Font.custom("BeVietnamPro-Regular", size: 15))
-                                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-                            InputField(icon: "calendar", placeholder: "MM / YY", text: $expiryDate)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("Security code")
-                                .font(Font.custom("BeVietnamPro-Regular", size: 15))
-                                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-                            InputField(icon: "lock", placeholder: "CVC", text: $securityCode)
-                        }
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Cardholder name")
-                            .font(Font.custom("BeVietnamPro-Regular", size: 15))
-                            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-                        InputField(icon: "person", placeholder: "Full Name", text: $cardholderName)
-                    }
+//                    VStack(alignment: .leading, spacing: 6) {
+//                        Text("Card number")
+//                            .font(Font.custom("BeVietnamPro-Regular", size: 15))
+//                            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+//                        InputField(icon: "creditcard", placeholder: "0000 0000 0000 0000", text: $cardNumber)
+//                    }
+//                    
+//                    HStack(spacing: 20) {
+//                        VStack(alignment: .leading, spacing: 6) {
+//                            Text("Expires")
+//                                .font(Font.custom("BeVietnamPro-Regular", size: 15))
+//                                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+//                            InputField(icon: "calendar", placeholder: "MM / YY", text: $expiryDate)
+//                        }
+//                        
+//                        VStack(alignment: .leading, spacing: 6) {
+//                            Text("Security code")
+//                                .font(Font.custom("BeVietnamPro-Regular", size: 15))
+//                                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+//                            InputField(icon: "lock", placeholder: "CVC", text: $securityCode)
+//                        }
+//                    }
+//                    
+//                    VStack(alignment: .leading, spacing: 6) {
+//                        Text("Cardholder name")
+//                            .font(Font.custom("BeVietnamPro-Regular", size: 15))
+//                            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+//                        InputField(icon: "person", placeholder: "Full Name", text: $cardholderName)
+//                    }
                     Button(action: {
                         // Handle create account action
                         userViewModel.finishRegistration()
@@ -414,10 +444,19 @@ struct RegistrationView3: View {
                 
                 Spacer()
                 
-                Text("Already have an account? Login here.")
-                    .font(Font.custom("BeVietnamPro-Regular", size: 14))
-                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-                    .padding(.bottom, 20)
+                Button(action: {
+                    // clear the navigation path to return to the root view (LoginView)
+                    path = NavigationPath()
+                }) {
+                    Text("Already have an account? Login ")
+                        .font(Font.custom("BeVietnamPro-Regular", size: 14))
+                        .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                    +
+                    Text("here.")
+                        .font(Font.custom("BeVietnamPro-Regular", size: 14).weight(.heavy))
+                        .foregroundColor(Color(red: 0.06, green: 0.36, blue: 0.22))
+                }
+                .padding(.bottom, 20)
             }
         }
         .navigationBarHidden(true)

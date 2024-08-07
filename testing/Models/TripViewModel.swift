@@ -27,7 +27,10 @@ class TripViewModel: ObservableObject {
     }
     
     func fetchAllTrips() {
-        db.collection("trips").getDocuments { (querySnapshot, error) in
+        let currentDate = Date()
+        db.collection("trips")
+            .whereField("date", isGreaterThanOrEqualTo: currentDate)
+            .getDocuments { (querySnapshot, error) in
             if let error = error {
                 print("Error getting documents: \(error)")
             } else {
@@ -91,19 +94,21 @@ class TripViewModel: ObservableObject {
     }
     
     func searchTrips(from: String, to: String, date: Date) {
-        db.collection("trips")
+        let currentDate = Date()
+        let query = db.collection("trips")
             .whereField("from", isEqualTo: from)
             .whereField("to", isEqualTo: to)
-            .whereField("date", isGreaterThanOrEqualTo: date)
-            .getDocuments { (querySnapshot, error) in
-                if let error = error {
-                    print("Error getting documents: \(error)")
-                } else {
-                    self.trips = querySnapshot?.documents.compactMap { document in
-                        try? document.data(as: TripInfo.self)
-                    } ?? []
-                }
+            .whereField("date", isGreaterThanOrEqualTo: currentDate)
+
+        query.getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                self.trips = querySnapshot?.documents.compactMap { document in
+                    try? document.data(as: TripInfo.self)
+                } ?? []
             }
+        }
     }
     
     func joinTrip(tripId: String, userId: String) {

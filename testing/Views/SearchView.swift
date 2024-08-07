@@ -10,6 +10,7 @@ import MapKit
 struct SearchView: View {
     @EnvironmentObject var userViewModel: UserViewModel
     @EnvironmentObject var tripViewModel: TripViewModel
+    @StateObject private var placeViewModel = PlaceViewModel()
     
     @State private var pickupLocation = ""
     @State private var destination = ""
@@ -22,8 +23,8 @@ struct SearchView: View {
     
     @State private var showingPickupResults = false
     @State private var showingDestinationResults = false
-    @StateObject private var placeViewModel = PlaceViewModel()
-    
+    @State private var showSettings = false
+
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d, yyyy"
@@ -39,7 +40,7 @@ struct SearchView: View {
                     VStack(spacing: 20) {
                         // Header
                         HStack(alignment: .top, spacing: 12) {
-                            AsyncImage(url: URL(string: "https://i.ibb.co/SBnxXDB/Screenshot-2024-07-19-at-2-45-05-PM.png")) { phase in
+                            AsyncImage(url: URL(string: "https://images.pexels.com/photos/6273480/pexels-photo-6273480.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")) { phase in
                                 switch phase {
                                 case .success(let image):
                                     image
@@ -61,7 +62,7 @@ struct SearchView: View {
                                 }
                             }
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Hello Theo 👋")
+                                Text("Hello \(userViewModel.user?.firstName ?? "there") 👋")
                                     .font(.custom("Be Vietnam Pro", size: 12))
                                     .foregroundColor(.black)
                                 
@@ -72,12 +73,16 @@ struct SearchView: View {
                             
                             Spacer()
                             
-                            Image(systemName: "gearshape")
-                                .foregroundColor(.black)
-                                .frame(width: 24, height: 24)
-                                .padding(6)
-                                .background(Color.black.opacity(0.1))
-                                .clipShape(Circle())
+                            Button(action: {
+                                showSettings = true
+                            }) {
+                                Image(systemName: "gearshape")
+                                    .foregroundColor(.black)
+                                    .frame(width: 24, height: 24)
+                                    .padding(6)
+                                    .background(Color.black.opacity(0.1))
+                                    .clipShape(Circle())
+                            }
                         }
                         .padding(.horizontal)
                         
@@ -92,71 +97,9 @@ struct SearchView: View {
                                 // Pickup location input
                                 locationInputField(title: "Pickup location", text: $pickupLocation, isPickup: true)
                                 
-//                                VStack {
-//                                    HStack {
-//                                        Image(systemName: "mappin.circle.fill")
-//                                            .foregroundColor(.gray)
-//                                        TextField("Pickup location", text: $pickupLocation)
-//                                            .font(.custom("Be Vietnam Pro", size: 16))
-//                                            .onChange(of: pickupLocation) { newValue in
-//                                                placeViewModel.searchAddress(newValue)
-//                                                showingPickupResults = true
-//                                                showingDestinationResults = false
-//                                            }
-//                                    }
-//                                    .padding()
-//                                    .background(Color.white)
-//                                    .cornerRadius(8)
-//                                    
-//                                    if showingPickupResults && !placeViewModel.places.isEmpty {
-//                                        List(placeViewModel.places) { place in
-//                                            Text(place.name)
-//                                                .onTapGesture {
-//                                                    pickupLocation = place.name
-//                                                    showingPickupResults = false
-//                                                }
-//                                        }
-//                                        .frame(height: min(CGFloat(placeViewModel.places.count) * 44, 200))
-//                                        .background(Color.white)
-//                                        .cornerRadius(8)
-//                                        .shadow(radius: 5)
-//                                    }
-//                                }
-                                
                                 // Destination input
                                 locationInputField(title: "Destination", text: $destination, isPickup: false)
-                                
-//                                VStack {
-//                                    HStack {
-//                                        Image(systemName: "mappin.and.ellipse")
-//                                            .foregroundColor(.gray)
-//                                        TextField("Destination", text: $destination)
-//                                            .font(.custom("Be Vietnam Pro", size: 16))
-//                                            .onChange(of: destination) { newValue in
-//                                                placeViewModel.searchAddress(newValue)
-//                                                showingDestinationResults = true
-//                                                showingPickupResults = false
-//                                            }
-//                                    }
-//                                    .padding()
-//                                    .background(Color.white)
-//                                    .cornerRadius(8)
-//                                    
-//                                    if showingDestinationResults && !placeViewModel.places.isEmpty {
-//                                        List(placeViewModel.places) { place in
-//                                            Text(place.name)
-//                                                .onTapGesture {
-//                                                    destination = place.name
-//                                                    showingDestinationResults = false
-//                                                }
-//                                        }
-//                                        .frame(height: min(CGFloat(placeViewModel.places.count) * 44, 200))
-//                                        .background(Color.white)
-//                                        .cornerRadius(8)
-//                                        .shadow(radius: 5)
-//                                    }
-//                                }
-                                
+   
                                 HStack {
                                     Image(systemName: "calendar")
                                         .foregroundColor(.gray)
@@ -231,6 +174,9 @@ struct SearchView: View {
                 }
                 .zIndex(1)
                 
+            }
+            .navigationDestination(isPresented: $showSettings) {
+                SettingsView()
             }
             .navigationDestination(isPresented: $showActiveTrips) {
                 ActiveTripsView()

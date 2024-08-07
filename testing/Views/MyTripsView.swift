@@ -91,8 +91,14 @@ struct MyTripsView: View {
             isLoading = false
             switch result {
             case .success(let trips):
-                self.createdTrips = trips.created
-                self.joinedTrips = trips.joined
+                let currentDate = Date()
+                
+                // Filter created trips (where the user is the host and the date is in the future)
+                self.createdTrips = trips.created.filter { $0.hostId == userViewModel.user?.id && $0.date >= currentDate }
+                
+                // Filter joined trips (where the user is not the host and the date is in the future)
+                self.joinedTrips = trips.joined.filter { $0.hostId != userViewModel.user?.id && $0.date >= currentDate }
+                
             case .failure(let error):
                 self.errorMessage = "Failed to load trips: \(error.localizedDescription)"
             }
