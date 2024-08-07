@@ -45,11 +45,9 @@ struct TripDetailsView: View {
 
             // Trip details card
             VStack(alignment: .leading, spacing: 20) {
-//                Text(trip.distance)
-//                    .font(.custom("BeVietnamPro-Regular", size: 12))
-//                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                 
                 HStack {
+                    
                     Text("\(trip.from) → \(trip.to)")
                         .font(.custom("Manrope-Regular", size: 18).weight(.heavy))
                         .foregroundColor(Color(red: 0.06, green: 0.36, blue: 0.22))
@@ -296,25 +294,25 @@ struct DetailRow: View {
     }
 }
 
-struct TripDetailsView_Previews: PreviewProvider {
-    static var previews: some View {
-        let mockTrip = TripInfo(
-            id: "mockId",
-            hostId: "mockHostId",
-            from: "Evans Hall",
-            to: "SFO, Terminal Two",
-            date: Date(),
-            joinedUsers: [],
-            totalSpots: 4,
-            distance: "0.2 Miles from your current location",
-            price: "$6.33"
-        )
-        
-        let mockUserViewModel = UserViewModel()
-        let mockTripViewModel = TripViewModel()
-        
-        return TripDetailsView(isFromActiveTrips: true, trip: mockTrip)
-            .environmentObject(mockUserViewModel)
-            .environmentObject(mockTripViewModel)
-    }
-}
+//struct TripDetailsView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        let mockTrip = TripInfo(
+//            id: "mockId",
+//            hostId: "mockHostId",
+//            from: "Evans Hall",
+//            to: "SFO, Terminal Two",
+//            date: Date(),
+//            joinedUsers: [],
+//            totalSpots: 4,
+//            distance: "0.2 Miles from your current location",
+//            price: "$6.33"
+//        )
+//        
+//        let mockUserViewModel = UserViewModel()
+//        let mockTripViewModel = TripViewModel()
+//        
+//        return TripDetailsView(isFromActiveTrips: true, trip: mockTrip)
+//            .environmentObject(mockUserViewModel)
+//            .environmentObject(mockTripViewModel)
+//    }
+//}

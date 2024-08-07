@@ -89,7 +89,7 @@ struct ActiveTripCard: View {
                     }
                     .foregroundColor(Color(red: 0.06, green: 0.36, blue: 0.22))
                     
-                    Text("\(formatDate(trip.date)) | \(trip.distance)")
+                    Text("\(formatDate(trip.date)) | \(formatDistance(trip.distance)) miles")
                         .font(.custom("BeVietnamPro-Regular", size: 8))
                         .foregroundColor(Color(red: 0.07, green: 0.36, blue: 0.22))
                 }
@@ -117,6 +117,10 @@ struct ActiveTripCard: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a, EEEE, MMMM d"
         return formatter.string(from: date)
+    }
+    
+    private func formatDistance(_ distance: Double) -> String {
+        return String(format: "%.1f miles", distance)
     }
 }
 

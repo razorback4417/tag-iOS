@@ -9,6 +9,7 @@ import SwiftUI
 struct HomeView: View {
     @State private var searchText = ""
     @Binding var showCreateView: Bool
+    @State private var showComingSoon = false
     var onFindRidesTapped: () -> Void
     
     let imageURLFind = URL(string: "https://images.pexels.com/photos/6268943/pexels-photo-6268943.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")!
@@ -36,16 +37,21 @@ struct HomeView: View {
                 
                 // Rewards and Deals
                 SectionView(title: "Rewards and Deals", items: [
-                    SectionItem(imageURL: imageURLDeal, title: "My rewards", description: "Earn rewards for each trip"),
-                    SectionItem(imageURL: imageURLReward, title: "Discover Deals", description: "Find restaurants to get discounts")
+                    SectionItem(imageURL: imageURLDeal, title: "My rewards", description: "Earn rewards for each trip", action: { showComingSoon = true }),
+                    SectionItem(imageURL: imageURLReward, title: "Discover Deals", description: "Find restaurants to get discounts", action: { showComingSoon = true })
                 ])
                 
                 // Join a Friend
-                JoinFriendView(imageURL: imageURLFriend)
+                Button(action: { showComingSoon = true }) {
+                    JoinFriendView(imageURL: imageURLFriend)
+                }
             }
             .padding()
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $showComingSoon) {
+            ComingSoonView()
+        }
     }
 }
 
@@ -137,10 +143,11 @@ struct SectionView: View {
                             Text(item.description)
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
+                                .lineLimit(2)  // Limit to 2 lines to ensure consistent height
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .buttonStyle(PlainButtonStyle())
+                    .frame(maxWidth: .infinity)  // This ensures equal width for both items
                 }
             }
         }
@@ -162,6 +169,7 @@ struct JoinFriendView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Join a Friend")
                 .font(.headline)
+                .foregroundColor(.black)
             
             AsyncImage(url: imageURL) { image in
                 image
