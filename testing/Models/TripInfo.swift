@@ -24,6 +24,6 @@ struct TripInfo: Identifiable, Codable {
     }
     
     var spots: String {
-        return "\(joinedUsers.count + 1)/\(totalSpots) spots"
+        return "\(joinedUsers.count)/\(totalSpots) spots"
     }
 }

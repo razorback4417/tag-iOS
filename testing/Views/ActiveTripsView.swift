@@ -10,6 +10,7 @@ import SwiftUI
 struct ActiveTripsView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var tripViewModel: TripViewModel
+    @State private var showCreateView = false
     
     var body: some View {
         ZStack {
@@ -41,14 +42,32 @@ struct ActiveTripsView: View {
                         }
                     }
                 }
-                Text("Can't Find a Trip? Create one here.")
-                    .font(.custom("BeVietnamPro-Regular", size: 10))
-                    .padding(.top, 20)
+                
+                Spacer()
+                
+                // Create Trip Text
+                Button(action: {
+                    showCreateView = true
+                }) {
+                    Text("Can't Find a Trip? Create one here.")
+                        .font(.custom("BeVietnamPro-Regular", size: 12))
+                        .foregroundColor(Color(red: 0.06, green: 0.36, blue: 0.22))
+                        .padding(.vertical, 10)
+                        .frame(maxWidth: .infinity)
+                }
+                .background(Color.white)
+                .cornerRadius(8)
+                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                .padding(.horizontal)
+                .padding(.bottom, 20)
             }
         }
         .navigationBarHidden(true)
         .onAppear {
             tripViewModel.fetchAllTrips()
+        }
+        .sheet(isPresented: $showCreateView) {
+            CreateView(isPresented: $showCreateView, onViewMyTrip: {})
         }
     }
 }

@@ -10,10 +10,13 @@ struct SettingsView: View {
     @State private var showAccountInfo = false
     @EnvironmentObject var userViewModel: UserViewModel
     
+    @State private var showRideHistory = false
+    @State private var showComingSoon = false
+    
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("Settings")
@@ -22,23 +25,18 @@ struct SettingsView: View {
                     
                     SettingsSection(title: "General", items: [
                         SettingsItem(icon: "gearshape", title: "Account information", action: { showAccountInfo = true }),
-                        SettingsItem(icon: "creditcard", title: "Payment methods"),
-                        SettingsItem(icon: "clock", title: "Ride History"),
-                        SettingsItem(icon: "person.2", title: "Friends")
+                        SettingsItem(icon: "clock", title: "Ride History", action: { showRideHistory = true }),
                     ])
                     
                     SettingsSection(title: "Support", items: [
-                        SettingsItem(icon: "exclamationmark.triangle", title: "Report an issue"),
-                        SettingsItem(icon: "questionmark.circle", title: "FAQ")
+                        SettingsItem(icon: "exclamationmark.triangle", title: "Report an issue", action: { showComingSoon = true }),
+                        SettingsItem(icon: "questionmark.circle", title: "FAQ", action: { showComingSoon = true }),
                     ])
                     
                     Spacer()
                     
                     Button(action: {
-                        // Handle logout action
-                        print("Logout done")
                         userViewModel.signOut()
-                        // Dismiss the current view to return to the login screen
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         Text("Logout")
@@ -54,14 +52,20 @@ struct SettingsView: View {
                 .padding()
             }
             .background(Color.white)
-            .navigationBarHidden(true)
-        }
-        .sheet(isPresented: $showAccountInfo) {
-            AccountInformationView()
-                .environmentObject(userViewModel)
+            .sheet(isPresented: $showAccountInfo) {
+                AccountInformationView()
+                    .environmentObject(userViewModel)
+            }
+            .navigationDestination(isPresented: $showRideHistory) {
+                RideHistoryView()
+            }
+            .navigationDestination(isPresented: $showComingSoon) {
+                ComingSoonView()
+            }
         }
     }
 }
+
 
 struct SettingsSection: View {
     let title: String

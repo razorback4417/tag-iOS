@@ -21,8 +21,6 @@ struct MainTabView: View {
     @State private var selectedTab = 0
     @State private var navigateToMyTrips = false
     
-    @State private var navigateToSearchView = false
-    
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
@@ -36,7 +34,7 @@ struct MainTabView: View {
             }
             .tag(0)
             
-            NavigationView {
+            NavigationStack {
                SearchView()
                    .environmentObject(tripViewModel)
                    .environmentObject(userViewModel)
@@ -51,9 +49,8 @@ struct MainTabView: View {
             }
             .tag(1)
             
-            NavigationView {
-                SettingsView()
-            }
+            SettingsView()
+                .environmentObject(userViewModel)
             .tabItem {
                 Image(systemName: "gear")
                 Text("Settings")
