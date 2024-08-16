@@ -44,8 +44,11 @@ struct MyTripsView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let errorMessage = errorMessage {
                     Text(errorMessage)
-                        .foregroundColor(.red)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .font(.custom("BeVietnamPro-Regular", size: 16))
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding()
                 } else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 20) {
