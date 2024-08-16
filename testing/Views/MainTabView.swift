@@ -20,6 +20,7 @@ struct MainTabView: View {
     @State private var showCreateView = false
     @State private var selectedTab = 0
     @State private var navigateToMyTrips = false
+    @State private var refreshTrigger = false
     
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -39,8 +40,9 @@ struct MainTabView: View {
                    .environmentObject(tripViewModel)
                    .environmentObject(userViewModel)
                    .navigationDestination(isPresented: $navigateToMyTrips) {
-                       MyTripsView()
+                       MyTripsView(refreshTrigger: $refreshTrigger)
                            .environmentObject(tripViewModel)
+                           .environmentObject(userViewModel)
                    }
            }
             .tabItem {
@@ -64,8 +66,11 @@ struct MainTabView: View {
                 selectedTab = 1
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     navigateToMyTrips = true
+                    refreshTrigger.toggle()  // refresh the MyTripsView when navigating from CreateView
                 }
             })
+            .environmentObject(userViewModel)
+            .environmentObject(tripViewModel)
         }
     }
 }

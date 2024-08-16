@@ -12,6 +12,7 @@ struct RideHistoryView: View {
     @EnvironmentObject var userViewModel: UserViewModel
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @State private var refreshTrigger = false
     
     var body: some View {
         ZStack {
@@ -34,7 +35,7 @@ struct RideHistoryView: View {
                     ScrollView {
                         VStack(spacing: 15) {
                             ForEach(tripViewModel.pastTrips) { trip in
-                                NavigationLink(destination: TripDetailsView(isFromActiveTrips: false, trip: trip)) {
+                                NavigationLink(destination: TripDetailsView(isFromActiveTrips: false, trip: trip, refreshTrigger: $refreshTrigger)) {
                                     TripCard(trip: trip)
                                 }
                             }

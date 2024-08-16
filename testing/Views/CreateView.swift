@@ -59,7 +59,15 @@ struct CreateView: View {
                     case 4:
                         Step4View(currentStep: $currentStep, createTripInfo: createTripInfo)
                     case 5:
-                        Step5View(currentStep: $currentStep, onViewMyTrip: onViewMyTrip)
+                        Step5View(
+                            currentStep: $currentStep,
+                            onViewMyTrip: onViewMyTrip,
+                            tripInfo: tripInfo,
+                            createTrip: { tripInfo in
+                                tripViewModel.createTrip(tripInfo)
+                                userViewModel.refreshUserTrips()
+                            }
+                        )
                     default:
                         EmptyView()
                     }
@@ -611,6 +619,8 @@ struct TripDetailRow: View {
 struct Step5View: View {
     @Binding var currentStep: Int
     var onViewMyTrip: () -> Void
+    var tripInfo: TripInfo?
+    var createTrip: (TripInfo) -> Void
     
     var body: some View {
         VStack(spacing: 20) {
@@ -634,6 +644,9 @@ struct Step5View: View {
             Spacer()
             
             Button(action: {
+                if let tripInfo = tripInfo {
+                    createTrip(tripInfo)
+                }
                 print("Navigating to My Trips")
                 onViewMyTrip()
             }) {

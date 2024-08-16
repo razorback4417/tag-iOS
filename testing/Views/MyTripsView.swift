@@ -9,100 +9,131 @@ import SwiftUI
 
 struct MyTripsView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var tripViewModel: TripViewModel
     @EnvironmentObject var userViewModel: UserViewModel
     @State private var createdTrips: [TripInfo] = []
     @State private var joinedTrips: [TripInfo] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
     
+    @Binding var refreshTrigger: Bool
+    
     var body: some View {
-            ZStack {
-                Color(red: 0.94, green: 0.94, blue: 0.94).edgesIgnoringSafeArea(.all)
-                
-                VStack(alignment: .leading, spacing: 20) {
-                    // Navigation bar
-                    HStack {
-                        Button(action: {
-                            dismiss()
-                        }) {
-                            Image(systemName: "arrow.left")
-                                .foregroundColor(.black)
-                        }
-                        Spacer()
-                        Text("My Trips")
-                            .font(.headline)
+        ZStack {
+            Color(red: 0.94, green: 0.94, blue: 0.94).edgesIgnoringSafeArea(.all)
+            
+            VStack(alignment: .leading, spacing: 20) {
+                // Navigation bar
+                HStack {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "arrow.left")
                             .foregroundColor(.black)
-                        Spacer()
                     }
-                    .padding()
-                    
-                    if isLoading {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else if let errorMessage = errorMessage {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else {
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 20) {
-                                if !createdTrips.isEmpty {
-                                    Text("Created Trips")
-                                        .font(.custom("Manrope-Regular", size: 15).weight(.bold))
-                                        .padding(.leading)
-                                    
-                                    ForEach(createdTrips) { trip in
-                                        NavigationLink(destination: TripDetailsView(isFromActiveTrips: false, trip: trip)) {
-                                            TripCard(trip: trip)
-                                        }
+                    Spacer()
+                    Text("My Trips")
+                        .font(.headline)
+                        .foregroundColor(.black)
+                    Spacer()
+                }
+                .padding()
+                
+                if isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let errorMessage = errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 20) {
+                            if !tripViewModel.activeCreatedTrips.isEmpty {
+                                Text("Created Trips")
+                                    .font(.custom("Manrope-Regular", size: 15).weight(.bold))
+                                    .padding(.leading)
+                                
+                                //                                ForEach(userViewModel.userTrips.created) { trip in
+                                ForEach(tripViewModel.activeCreatedTrips) { trip in
+                                    NavigationLink(destination: TripDetailsView(isFromActiveTrips: false, trip: trip, refreshTrigger: $refreshTrigger)) {
+                                        TripCard(trip: trip)
                                     }
                                 }
+                            }
+                            
+                            if !tripViewModel.activeJoinedTrips.isEmpty {
+                                Text("Joined Trips")
+                                    .font(.custom("Manrope-Regular", size: 15).weight(.bold))
+                                    .padding(.leading)
                                 
-                                if !joinedTrips.isEmpty {
-                                    Text("Joined Trips")
-                                        .font(.custom("Manrope-Regular", size: 15).weight(.bold))
-                                        .padding(.leading)
-                                    
-                                    ForEach(joinedTrips) { trip in
-                                        NavigationLink(destination: TripDetailsView(isFromActiveTrips: false, trip: trip)) {
-                                            TripCard(trip: trip)
-                                        }
+                                //                                ForEach(userViewModel.userTrips.joined) { trip in
+                                ForEach(tripViewModel.activeJoinedTrips) { trip in
+                                    NavigationLink(destination: TripDetailsView(isFromActiveTrips: false, trip: trip, refreshTrigger: $refreshTrigger)) {
+                                        TripCard(trip: trip)
                                     }
                                 }
-                                
-                                if createdTrips.isEmpty && joinedTrips.isEmpty {
-                                    Text("You haven't created or joined any trips yet.")
-                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                }
+                            }
+                            
+                            if tripViewModel.activeCreatedTrips.isEmpty && tripViewModel.activeJoinedTrips.isEmpty {
+                                Text("You haven't created or joined any trips yet.")
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                             }
                         }
                     }
                 }
             }
-            .navigationBarHidden(true)
-            .onAppear(perform: loadTrips)
+        }
+        .navigationBarHidden(true)
+        .onAppear(perform: loadTrips)
+        .onChange(of: refreshTrigger) { _, _ in loadTrips() }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            loadTrips()
+        }
     }
+    
+    //    private func loadTrips() {
+    //        isLoading = true
+    //        errorMessage = nil
+    //
+    //        userViewModel.fetchUserTrips { result in
+    //            DispatchQueue.main.async {
+    //                self.isLoading = false
+    //                switch result {
+    //                case .success:
+    //                    // The userTrips property in userViewModel is already updated
+    //                    break
+    //                case .failure(let error):
+    //                    self.errorMessage = "Failed to load trips: \(error.localizedDescription)"
+    //                }
+    //            }
+    //        }
+    //    }
     
     private func loadTrips() {
         isLoading = true
         errorMessage = nil
         
-        userViewModel.fetchUserTrips { result in
+        guard let userId = userViewModel.user?.id else {
+            errorMessage = "Unable to fetch user information."
             isLoading = false
-            switch result {
-            case .success(let trips):
-                let currentDate = Date()
-                
-                // Filter created trips (where the user is the host and the date is in the future)
-                self.createdTrips = trips.created.filter { $0.hostId == userViewModel.user?.id && $0.date >= currentDate }
-                
-                // Filter joined trips (where the user is not the host and the date is in the future)
-                self.joinedTrips = trips.joined.filter { $0.hostId != userViewModel.user?.id && $0.date >= currentDate }
-                
-            case .failure(let error):
-                self.errorMessage = "Failed to load trips: \(error.localizedDescription)"
-            }
+            return
         }
+        
+        tripViewModel.fetchActiveTrips(for: userId)
+        
+        // Use a DispatchQueue to check if the trips have been loaded after a short delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // 1 second delay
+            if self.tripViewModel.activeCreatedTrips.isEmpty && self.tripViewModel.activeJoinedTrips.isEmpty {
+                // If both arrays are still empty after the delay, assume an error occurred
+                self.errorMessage = "Failed to load trips. Please try again."
+            }
+            self.isLoading = false
+        }
+    }
+    
+    func refreshView() {
+        refreshTrigger.toggle()
     }
 }
 
@@ -158,9 +189,9 @@ struct TripCard: View {
     }
 }
 
-struct MyTripsView_Previews: PreviewProvider {
-    static var previews: some View {
-        MyTripsView()
-            .environmentObject(UserViewModel())
-    }
-}
+//struct MyTripsView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        MyTripsView()
+//            .environmentObject(UserViewModel())
+//    }
+//}

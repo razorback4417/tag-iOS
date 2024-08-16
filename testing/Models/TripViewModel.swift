@@ -14,10 +14,12 @@ class TripViewModel: ObservableObject {
     private var db = Firestore.firestore()
     @Published var trips: [TripInfo] = []
     @Published var userTrips: [TripInfo] = []
-    
     @Published var searchResults: [TripInfo] = []
-    
+    @Published var activeTrips: [TripInfo] = []
     @Published var pastTrips: [TripInfo] = []
+    
+    @Published var activeCreatedTrips: [TripInfo] = []
+    @Published var activeJoinedTrips: [TripInfo] = []
     
     func createTrip(_ trip: TripInfo) {
         let fromCoord = CLLocation(latitude: trip.fromLatitude, longitude: trip.fromLongitude)
@@ -31,7 +33,11 @@ class TripViewModel: ObservableObject {
         updatedTrip.distance = roundedDistance
         
         do {
-            _ = try db.collection("trips").addDocument(from: updatedTrip)
+            let docRef = try db.collection("trips").addDocument(from: updatedTrip)
+            let tripId = docRef.documentID
+            updateUserCreatedTrips(userId: trip.hostId, tripId: tripId)
+            self.fetchAllTrips() // Refresh all trips
+            self.objectWillChange.send()
         } catch {
             print("Error creating trip: \(error.localizedDescription)")
         }
@@ -42,14 +48,108 @@ class TripViewModel: ObservableObject {
         db.collection("trips")
             .whereField("date", isGreaterThanOrEqualTo: currentDate)
             .getDocuments { (querySnapshot, error) in
-            if let error = error {
-                print("Error getting documents: \(error)")
-            } else {
-                self.trips = querySnapshot?.documents.compactMap { document in
+                if let error = error {
+                    print("Error getting documents: \(error)")
+                } else {
+                    self.trips = querySnapshot?.documents.compactMap { document in
+                        try? document.data(as: TripInfo.self)
+                    } ?? []
+                }
+            }
+    }
+    //
+    //    func fetchActiveTrips(for userId: String) {
+    //        let currentDate = Date()
+    //        db.collection("trips")
+    //            .whereField("date", isGreaterThanOrEqualTo: currentDate)
+    //            .getDocuments { [weak self] (querySnapshot, error) in
+    //                guard let self = self else { return }
+    //                if let error = error {
+    //                    print("Error fetching active trips: \(error)")
+    //                    return
+    //                }
+    //
+    //                self.activeTrips = querySnapshot?.documents.compactMap { document -> TripInfo? in
+    //                    let trip = try? document.data(as: TripInfo.self)
+    //                    return trip?.hostId == userId || trip?.joinedUsers.contains(userId) == true ? trip : nil
+    //                } ?? []
+    //
+    //                DispatchQueue.main.async {
+    //                    self.objectWillChange.send()
+    //                }
+    //            }
+    //    }
+    
+    func fetchActiveTrips(for userId: String) {
+        fetchActiveCreatedTrips(for: userId)
+        fetchActiveJoinedTrips(for: userId)
+    }
+    
+    private func fetchActiveCreatedTrips(for userId: String) {
+        db.collection("trips")
+            .whereField("hostId", isEqualTo: userId)
+            .whereField("date", isGreaterThanOrEqualTo: Date())
+            .order(by: "date", descending: false)
+            .getDocuments { [weak self] (snapshot, error) in
+                if let error = error {
+                    print("Error fetching active created trips: \(error)")
+                    return
+                }
+                
+                self?.activeCreatedTrips = snapshot?.documents.compactMap { document -> TripInfo? in
                     try? document.data(as: TripInfo.self)
                 } ?? []
+                
+                DispatchQueue.main.async {
+                    self?.objectWillChange.send()
+                }
             }
-        }
+    }
+    
+//    private func fetchActiveJoinedTrips(for userId: String) {
+//        db.collection("trips")
+//            .whereField("joinedUsers", arrayContains: userId)
+//            .whereField("date", isGreaterThanOrEqualTo: Date())
+//            .order(by: "date", descending: false)
+//            .getDocuments { [weak self] (snapshot, error) in
+//                if let error = error {
+//                    print("Error fetching active joined trips: \(error)")
+//                    return
+//                }
+//                
+//                self?.activeJoinedTrips = snapshot?.documents.compactMap { document -> TripInfo? in
+//                    try? document.data(as: TripInfo.self)
+//                } ?? []
+//                
+//                DispatchQueue.main.async {
+//                    self?.objectWillChange.send()
+//                }
+//            }
+//    }
+    
+    private func fetchActiveJoinedTrips(for userId: String) {
+        db.collection("trips")
+            .whereField("joinedUsers", arrayContains: userId)
+            .whereField("date", isGreaterThanOrEqualTo: Date())
+            .order(by: "date", descending: false)
+            .getDocuments { [weak self] (snapshot, error) in
+                if let error = error {
+                    print("Error fetching active joined trips: \(error)")
+                    return
+                }
+                
+                self?.activeJoinedTrips = snapshot?.documents.compactMap { document -> TripInfo? in
+                    if let trip = try? document.data(as: TripInfo.self),
+                       trip.hostId != userId {  // Only include if the user is not the host
+                        return trip
+                    }
+                    return nil
+                } ?? []
+                
+                DispatchQueue.main.async {
+                    self?.objectWillChange.send()
+                }
+            }
     }
     
     func fetchUserTrips(userId: String) {
@@ -86,7 +186,6 @@ class TripViewModel: ObservableObject {
      __name__ - des
      */
     func fetchPastTrips(for userId: String) {
-        print("in past trips")
         let db = Firestore.firestore()
         db.collection("trips")
             .whereField("joinedUsers", arrayContains: userId)
@@ -110,7 +209,7 @@ class TripViewModel: ObservableObject {
             .whereField("from", isEqualTo: from)
             .whereField("to", isEqualTo: to)
             .whereField("date", isGreaterThanOrEqualTo: currentDate)
-
+        
         query.getDocuments { (querySnapshot, error) in
             if let error = error {
                 print("Error getting documents: \(error)")
@@ -122,7 +221,7 @@ class TripViewModel: ObservableObject {
         }
     }
     
-    func joinTrip(tripId: String, userId: String) {
+    func joinTrip(tripId: String, userId: String, userViewModel: UserViewModel) {
         db.collection("trips").document(tripId).updateData([
             "joinedUsers": FieldValue.arrayUnion([userId])
         ]) { error in
@@ -130,42 +229,64 @@ class TripViewModel: ObservableObject {
                 print("Error joining trip: \(error)")
             } else {
                 print("Successfully joined trip")
+                self.updateUserJoinedTrips(userId: userId, tripId: tripId)
+                self.fetchAllTrips()
+                userViewModel.refreshUserTrips()
+                self.objectWillChange.send()
             }
         }
     }
     
-    func leaveTrip(tripId: String, userId: String) {
+    //    func leaveTrip(tripId: String, userId: String) {
+    func leaveTrip(tripId: String, userId: String, userViewModel: UserViewModel, completion: @escaping () -> Void) {
         db.collection("trips").document(tripId).updateData([
             "joinedUsers": FieldValue.arrayRemove([userId])
         ]) { error in
             if let error = error {
                 print("Error leaving trip: \(error.localizedDescription)")
             } else {
-                // Update user's joinedTrips array
-                self.db.collection("users").document(userId).updateData([
-                    "joinedTrips": FieldValue.arrayRemove([tripId])
-                ])
+                self.removeUserJoinedTrip(userId: userId, tripId: tripId)
                 self.fetchAllTrips()
-                self.fetchUserTrips(userId: userId)
+                userViewModel.refreshUserTrips()
+                self.objectWillChange.send()
             }
+        }
+        
+        DispatchQueue.main.async {
+            self.activeTrips.removeAll { $0.id == tripId }
+            self.objectWillChange.send()
+            completion()
         }
     }
     
-    func deleteTrip(tripId: String, userId: String) {
+    //    func deleteTrip(tripId: String, userId: String) {
+    //        db.collection("trips").document(tripId).delete { error in
+    //            if let error = error {
+    //                print("Error deleting trip: \(error.localizedDescription)")
+    //            } else {
+    //                // Remove the trip from the user's createdTrips array
+    //                self.removeUserCreatedTrip(userId: userId, tripId: tripId)
+    //
+    //                // Update the local trips array
+    //                self.trips.removeAll { $0.id == tripId }
+    //                self.fetchUserTrips(userId: userId)
+    //
+    //                // Notify views that the data has changed
+    //                DispatchQueue.main.async {
+    //                    self.objectWillChange.send()
+    //                }
+    //            }
+    //        }
+    //    }
+    func deleteTrip(tripId: String, userId: String, userViewModel: UserViewModel) {
         db.collection("trips").document(tripId).delete { error in
             if let error = error {
                 print("Error deleting trip: \(error.localizedDescription)")
             } else {
-                // Remove the trip from the user's createdTrips array
-                self.db.collection("users").document(userId).updateData([
-                    "createdTrips": FieldValue.arrayRemove([tripId])
-                ])
-                
-                // Update the local trips array
+                self.removeUserCreatedTrip(userId: userId, tripId: tripId)
                 self.trips.removeAll { $0.id == tripId }
                 self.fetchUserTrips(userId: userId)
-                
-                // Notify views that the data has changed
+                userViewModel.refreshUserTrips()
                 DispatchQueue.main.async {
                     self.objectWillChange.send()
                 }
@@ -229,5 +350,29 @@ class TripViewModel: ObservableObject {
             }
             completion(location)
         }
+    }
+    
+    private func updateUserCreatedTrips(userId: String, tripId: String) {
+        db.collection("users").document(userId).updateData([
+            "createdTrips": FieldValue.arrayUnion([tripId])
+        ])
+    }
+    
+    private func updateUserJoinedTrips(userId: String, tripId: String) {
+        db.collection("users").document(userId).updateData([
+            "joinedTrips": FieldValue.arrayUnion([tripId])
+        ])
+    }
+    
+    private func removeUserJoinedTrip(userId: String, tripId: String) {
+        db.collection("users").document(userId).updateData([
+            "joinedTrips": FieldValue.arrayRemove([tripId])
+        ])
+    }
+    
+    private func removeUserCreatedTrip(userId: String, tripId: String) {
+        db.collection("users").document(userId).updateData([
+            "createdTrips": FieldValue.arrayRemove([tripId])
+        ])
     }
 }

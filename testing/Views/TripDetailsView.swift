@@ -14,7 +14,9 @@ struct TripDetailsView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var userViewModel: UserViewModel
     @EnvironmentObject var tripViewModel: TripViewModel
+    @Binding var refreshTrigger: Bool
     @State private var showingDeleteConfirmation = false
+    @State private var showingLeaveConfirmation = false
     @State private var showingJoinedUsers = false
     @State private var hostName = ""
     @State private var joinedUserNames: [String] = []
@@ -132,7 +134,7 @@ struct TripDetailsView: View {
             if isFromActiveTrips {
                 if trip.hostId != Auth.auth().currentUser?.uid && !trip.joinedUsers.contains(Auth.auth().currentUser?.uid ?? "") {
                     Button(action: {
-                        tripViewModel.joinTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "")
+                        tripViewModel.joinTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "", userViewModel: userViewModel)
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         Text("Join Trip")
@@ -166,7 +168,7 @@ struct TripDetailsView: View {
                             title: Text("Delete Trip"),
                             message: Text("Are you sure you want to delete this trip?"),
                             primaryButton: .destructive(Text("Delete")) {
-                                tripViewModel.deleteTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "")
+                                tripViewModel.deleteTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "", userViewModel: userViewModel)
                                 presentationMode.wrappedValue.dismiss()
                             },
                             secondaryButton: .cancel()
@@ -174,8 +176,7 @@ struct TripDetailsView: View {
                     }
                 } else if trip.joinedUsers.contains(Auth.auth().currentUser?.uid ?? "") {
                     Button(action: {
-                        tripViewModel.leaveTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "")
-                        presentationMode.wrappedValue.dismiss()
+                        showingLeaveConfirmation = true
                     }) {
                         Text("Leave Trip")
                             .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
@@ -187,6 +188,34 @@ struct TripDetailsView: View {
                     }
                     .padding(.horizontal, 24)
                     Spacer()
+                    .alert(isPresented: $showingLeaveConfirmation) {
+                        Alert(
+                            title: Text("Leave Trip"),
+                            message: Text("Are you sure you want to leave this trip?"),
+                            primaryButton: .destructive(Text("Leave")) {
+                                tripViewModel.leaveTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "", userViewModel: userViewModel) {
+                                    userViewModel.refreshUserTrips()
+                                    refreshTrigger.toggle()
+                                    presentationMode.wrappedValue.dismiss()
+                                }
+                            },
+                            secondaryButton: .cancel()
+                        )
+                    }
+//                    .alert(isPresented: $showingLeaveConfirmation) {
+//                        Alert(
+//                            title: Text("Leave Trip"),
+//                            message: Text("Are you sure you want to leave this trip?"),
+//                            primaryButton: .destructive(Text("Leave")) {
+//                                tripViewModel.leaveTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "") {
+//                                    userViewModel.refreshUserTrips()
+//                                    refreshTrigger.toggle()
+//                                    presentationMode.wrappedValue.dismiss()
+//                                }
+//                            },
+//                            secondaryButton: .cancel()
+//                        )
+//                    }
                 }
             }
         }
@@ -271,7 +300,7 @@ struct JoinedUsersView: View {
     private func loadUserNames() {
         isLoading = true
         userViewModel.fetchUserNames(userIds: joinedUserIds) { names in
-            self.joinedUserNames = names
+            self.joinedUserNames = names.reversed()
             self.isLoading = false
         }
     }

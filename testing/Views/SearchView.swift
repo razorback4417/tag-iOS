@@ -24,6 +24,8 @@ struct SearchView: View {
     @State private var showingPickupResults = false
     @State private var showingDestinationResults = false
     @State private var showSettings = false
+    
+    @State private var refreshTrigger = false
 
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -184,7 +186,7 @@ struct SearchView: View {
                 ActiveTripsView()
             }
             .navigationDestination(isPresented: $showMyTrips) {
-                MyTripsView()
+                MyTripsView(refreshTrigger: $refreshTrigger)
                     .environmentObject(userViewModel)
             }
         }
@@ -256,10 +258,11 @@ struct SearchView: View {
 
 struct SearchResultsView: View {
     let trips: [TripInfo]
+    @State private var refreshTrigger = false
     
     var body: some View {
         List(trips) { trip in
-            NavigationLink(destination: TripDetailsView(isFromActiveTrips: true, trip: trip)) {
+            NavigationLink(destination: TripDetailsView(isFromActiveTrips: true, trip: trip, refreshTrigger: $refreshTrigger)) {
                 TripCard(trip: trip)
             }
         }
