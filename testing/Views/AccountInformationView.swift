@@ -27,11 +27,11 @@ struct AccountInformationView: View {
                                     .aspectRatio(contentMode: .fill)
                                     .frame(width: 120, height: 120)
                                     .clipShape(Circle())
-                                //                                    .overlay(
-                                //                                        Image(systemName: "pencil.circle.fill")
-                                //                                            .foregroundColor(.green)
-                                //                                            .offset(x: 40, y: 50)
-                                //                                    )
+//                                    .overlay(
+//                                        Image(systemName: "pencil.circle.fill")
+//                                            .foregroundColor(.green)
+//                                            .offset(x: 40, y: 50)
+//                                    )
                             case .failure(_):
                                 Image(systemName: "person.circle.fill")
                                     .resizable()

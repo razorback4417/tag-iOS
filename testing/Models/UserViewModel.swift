@@ -74,6 +74,20 @@ class UserViewModel: ObservableObject {
         }
     }
     
+    func signIn(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        Auth.auth().signIn(withEmail: email, password: password) { [weak self] result, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                self?.isLoggedIn = true
+                if let userId = result?.user.uid {
+                    self?.fetchUserData(userId: userId)
+                }
+                completion(.success(()))
+            }
+        }
+    }
+    
     func signOut() {
         do {
             try Auth.auth().signOut()

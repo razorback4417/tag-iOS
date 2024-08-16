@@ -168,17 +168,6 @@ struct Step1View: View {
             }
             .padding(.horizontal, 24)
             
-            //            if selection == "Just me", let user = userViewModel.user {
-            //                VStack(alignment: .leading, spacing: 10) {
-            //                    Text("Host Information")
-            //                        .font(.headline)
-            //
-            //                    Text("Name: \(user.firstName) \(user.lastName)")
-            //                    Text("Phone: \(user.phoneNumber)")
-            //                }
-            //                .padding(.horizontal, 24)
-            //            }
-            
             Spacer()
             
             Button(action: {
@@ -671,6 +660,3 @@ struct CreateView_Previews: PreviewProvider {
             .environmentObject(TripViewModel())
     }
 }
-
-
-//
