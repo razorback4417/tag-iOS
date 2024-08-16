@@ -162,22 +162,22 @@ struct Step1View: View {
             .padding(.horizontal, 24)
             
             VStack(spacing: 10) {
-                        SelectionButton(title: "Just me", subtitle: "Find other verified students to share the ride with", isSelected: selection == "Just me", action: { selection = "Just me" })
-                        
-                        SelectionButton(title: "Friends", subtitle: "Create a private trip with an invite code to send out", isSelected: selection == "Friends", action: { selection = "Friends" })
-                    }
+                SelectionButton(title: "Just me", subtitle: "Find other verified students to share the ride with", isSelected: selection == "Just me", action: { selection = "Just me" })
+                
+                SelectionButton(title: "Friends", subtitle: "Create a private trip with an invite code to send out", isSelected: selection == "Friends", action: { selection = "Friends" })
+            }
             .padding(.horizontal, 24)
-
-//            if selection == "Just me", let user = userViewModel.user {
-//                VStack(alignment: .leading, spacing: 10) {
-//                    Text("Host Information")
-//                        .font(.headline)
-//                    
-//                    Text("Name: \(user.firstName) \(user.lastName)")
-//                    Text("Phone: \(user.phoneNumber)")
-//                }
-//                .padding(.horizontal, 24)
-//            }
+            
+            //            if selection == "Just me", let user = userViewModel.user {
+            //                VStack(alignment: .leading, spacing: 10) {
+            //                    Text("Host Information")
+            //                        .font(.headline)
+            //
+            //                    Text("Name: \(user.firstName) \(user.lastName)")
+            //                    Text("Phone: \(user.phoneNumber)")
+            //                }
+            //                .padding(.horizontal, 24)
+            //            }
             
             Spacer()
             
@@ -258,7 +258,7 @@ struct Step2View: View {
                     showingPickupResults = false
                     showingDestinationResults = false
                 }
-
+            
             VStack(alignment: .leading, spacing: 20) {
                 // Header
                 VStack(alignment: .leading, spacing: 5) {
@@ -293,7 +293,7 @@ struct Step2View: View {
                     .padding()
                     .background(Color(red: 0.95, green: 0.95, blue: 0.95))
                     .cornerRadius(8)
-
+                    
                     // Destination input
                     HStack {
                         Image(systemName: "mappin.and.ellipse")
@@ -343,10 +343,10 @@ struct Step2View: View {
                 Spacer().frame(height: 210)
                 if showingPickupResults && !placeViewModel.places.isEmpty {
                     predictionsListView(for: .pickup)
-//                        .offset(y: 145)
+                    //                        .offset(y: 145)
                 } else if showingDestinationResults && !placeViewModel.places.isEmpty {
                     predictionsListView(for: .destination)
-//                        .offset(y: 205) // Adjust this value to position the list correctly
+                    //                        .offset(y: 205) // Adjust this value to position the list correctly
                 }
                 Spacer()
             }

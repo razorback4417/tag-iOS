@@ -13,7 +13,7 @@ struct ActiveTripsView: View {
     @State private var showCreateView = false
     
     @State private var refreshTrigger = false
-
+    
     var body: some View {
         ZStack {
             Color(red: 0.94, green: 0.94, blue: 0.94).edgesIgnoringSafeArea(.all)

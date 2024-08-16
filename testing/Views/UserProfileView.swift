@@ -12,7 +12,7 @@ struct UserProfileView: View {
     @EnvironmentObject var userViewModel: UserViewModel
     @State private var user: User?
     @State private var isLoading = true
-
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -71,12 +71,12 @@ struct UserProfileView: View {
                     ], id: \.self) { item in
                         HStack {
                             Image(systemName: item.hasPrefix("School") ? "building.columns" :
-                                             (item.hasPrefix("Major") ? "book" :
-                                             (item.hasPrefix("Phone") ? "phone.fill" : "star")))
-                                .foregroundColor(.white)
-                                .frame(width: 30, height: 30)
-                                .background(Color(red: 0.06, green: 0.36, blue: 0.22))
-                                .clipShape(Circle())
+                                    (item.hasPrefix("Major") ? "book" :
+                                        (item.hasPrefix("Phone") ? "phone.fill" : "star")))
+                            .foregroundColor(.white)
+                            .frame(width: 30, height: 30)
+                            .background(Color(red: 0.06, green: 0.36, blue: 0.22))
+                            .clipShape(Circle())
                             Text(item)
                             Spacer()
                         }
@@ -93,7 +93,7 @@ struct UserProfileView: View {
             fetchUserProfile()
         }
     }
-
+    
     private func fetchUserProfile() {
         isLoading = true
         userViewModel.fetchUserProfile(userId: userId) { result in

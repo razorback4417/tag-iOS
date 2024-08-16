@@ -11,7 +11,7 @@ import SwiftUI
 struct LoginView: View {
     @EnvironmentObject private var userViewModel: UserViewModel
     
-//    @StateObject private var userViewModel = UserViewModel() JUST REPLACED 4:30
+    //    @StateObject private var userViewModel = UserViewModel() JUST REPLACED 4:30
     @State private var path = NavigationPath()
     
     @State private var username = ""
@@ -22,16 +22,16 @@ struct LoginView: View {
     
     //NEW BODY
     var body: some View {
-            Group {
-                if userViewModel.isLoggedIn {
-                    MainTabView()
-                } else {
-                    loginContent
-                }
+        Group {
+            if userViewModel.isLoggedIn {
+                MainTabView()
+            } else {
+                loginContent
             }
         }
+    }
     
-//    var body: some View {
+    //    var body: some View {
     var loginContent: some View {
         NavigationStack(path: $path) {
             ZStack {
@@ -234,7 +234,7 @@ struct RegistrationView1: View {
                         .foregroundColor(Color(red: 0.06, green: 0.36, blue: 0.22))
                 }
                 .padding(.bottom, 20)
-
+                
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -292,7 +292,7 @@ struct RegistrationView2: View {
                 }
                 .padding(.top, 40)
                 .padding(.horizontal, 20)
-
+                
                 Button(action: {
                     let step2Data = RegistrationStep2Data(
                         gender: gender,
@@ -387,35 +387,35 @@ struct RegistrationView3: View {
                             .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                         InputField(icon: "creditcard", placeholder: "Venmo, Zelle, Cashapp, etc.", text: $cardNumber)
                     }
-//                    VStack(alignment: .leading, spacing: 6) {
-//                        Text("Card number")
-//                            .font(Font.custom("BeVietnamPro-Regular", size: 15))
-//                            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-//                        InputField(icon: "creditcard", placeholder: "0000 0000 0000 0000", text: $cardNumber)
-//                    }
-//                    
-//                    HStack(spacing: 20) {
-//                        VStack(alignment: .leading, spacing: 6) {
-//                            Text("Expires")
-//                                .font(Font.custom("BeVietnamPro-Regular", size: 15))
-//                                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-//                            InputField(icon: "calendar", placeholder: "MM / YY", text: $expiryDate)
-//                        }
-//                        
-//                        VStack(alignment: .leading, spacing: 6) {
-//                            Text("Security code")
-//                                .font(Font.custom("BeVietnamPro-Regular", size: 15))
-//                                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-//                            InputField(icon: "lock", placeholder: "CVC", text: $securityCode)
-//                        }
-//                    }
-//                    
-//                    VStack(alignment: .leading, spacing: 6) {
-//                        Text("Cardholder name")
-//                            .font(Font.custom("BeVietnamPro-Regular", size: 15))
-//                            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
-//                        InputField(icon: "person", placeholder: "Full Name", text: $cardholderName)
-//                    }
+                    //                    VStack(alignment: .leading, spacing: 6) {
+                    //                        Text("Card number")
+                    //                            .font(Font.custom("BeVietnamPro-Regular", size: 15))
+                    //                            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                    //                        InputField(icon: "creditcard", placeholder: "0000 0000 0000 0000", text: $cardNumber)
+                    //                    }
+                    //
+                    //                    HStack(spacing: 20) {
+                    //                        VStack(alignment: .leading, spacing: 6) {
+                    //                            Text("Expires")
+                    //                                .font(Font.custom("BeVietnamPro-Regular", size: 15))
+                    //                                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                    //                            InputField(icon: "calendar", placeholder: "MM / YY", text: $expiryDate)
+                    //                        }
+                    //
+                    //                        VStack(alignment: .leading, spacing: 6) {
+                    //                            Text("Security code")
+                    //                                .font(Font.custom("BeVietnamPro-Regular", size: 15))
+                    //                                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                    //                            InputField(icon: "lock", placeholder: "CVC", text: $securityCode)
+                    //                        }
+                    //                    }
+                    //
+                    //                    VStack(alignment: .leading, spacing: 6) {
+                    //                        Text("Cardholder name")
+                    //                            .font(Font.custom("BeVietnamPro-Regular", size: 15))
+                    //                            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                    //                        InputField(icon: "person", placeholder: "Full Name", text: $cardholderName)
+                    //                    }
                     Button(action: {
                         // Handle create account action
                         userViewModel.finishRegistration()
@@ -464,7 +464,7 @@ struct RegistrationView3: View {
 }
 
 struct RegistrationConfirmView: View {
-//    @Environment(\.presentationMode) var presentationMode
+    //    @Environment(\.presentationMode) var presentationMode
     @Binding var path: NavigationPath
     
     var body: some View {

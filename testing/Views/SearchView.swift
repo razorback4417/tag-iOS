@@ -26,7 +26,7 @@ struct SearchView: View {
     @State private var showSettings = false
     
     @State private var refreshTrigger = false
-
+    
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d, yyyy"
@@ -101,7 +101,7 @@ struct SearchView: View {
                                 
                                 // Destination input
                                 locationInputField(title: "Destination", text: $destination, isPickup: false)
-   
+                                
                                 HStack {
                                     Image(systemName: "calendar")
                                         .foregroundColor(.gray)
@@ -154,8 +154,8 @@ struct SearchView: View {
                         Spacer()
                         
                         NavigationLink(destination: ActiveTripsView().environmentObject(tripViewModel), isActive: $navigateToActiveTrips) {
-                           EmptyView()
-                       }
+                            EmptyView()
+                        }
                     }
                     .padding(.top, 60)
                 }

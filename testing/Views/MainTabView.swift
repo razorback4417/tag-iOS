@@ -36,15 +36,15 @@ struct MainTabView: View {
             .tag(0)
             
             NavigationStack {
-               SearchView()
-                   .environmentObject(tripViewModel)
-                   .environmentObject(userViewModel)
-                   .navigationDestination(isPresented: $navigateToMyTrips) {
-                       MyTripsView(refreshTrigger: $refreshTrigger)
-                           .environmentObject(tripViewModel)
-                           .environmentObject(userViewModel)
-                   }
-           }
+                SearchView()
+                    .environmentObject(tripViewModel)
+                    .environmentObject(userViewModel)
+                    .navigationDestination(isPresented: $navigateToMyTrips) {
+                        MyTripsView(refreshTrigger: $refreshTrigger)
+                            .environmentObject(tripViewModel)
+                            .environmentObject(userViewModel)
+                    }
+            }
             .tabItem {
                 Image(systemName: "map")
                 Text("Trips")
@@ -53,11 +53,11 @@ struct MainTabView: View {
             
             SettingsView()
                 .environmentObject(userViewModel)
-            .tabItem {
-                Image(systemName: "gear")
-                Text("Settings")
-            }
-            .tag(2)
+                .tabItem {
+                    Image(systemName: "gear")
+                    Text("Settings")
+                }
+                .tag(2)
         }
         .accentColor(Color(red: 0.25, green: 0.55, blue: 0.15))
         .fullScreenCover(isPresented: $showCreateView) {
@@ -66,7 +66,7 @@ struct MainTabView: View {
                 selectedTab = 1
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     navigateToMyTrips = true
-                    refreshTrigger.toggle()  // refresh the MyTripsView when navigating from CreateView
+                    refreshTrigger.toggle()
                 }
             })
             .environmentObject(userViewModel)

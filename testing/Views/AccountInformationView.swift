@@ -13,7 +13,7 @@ struct AccountInformationView: View {
     @EnvironmentObject var userViewModel: UserViewModel
     
     let darkGreenColor = Color(red: 0.06, green: 0.36, blue: 0.22)
-
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -27,11 +27,11 @@ struct AccountInformationView: View {
                                     .aspectRatio(contentMode: .fill)
                                     .frame(width: 120, height: 120)
                                     .clipShape(Circle())
-//                                    .overlay(
-//                                        Image(systemName: "pencil.circle.fill")
-//                                            .foregroundColor(.green)
-//                                            .offset(x: 40, y: 50)
-//                                    )
+                                //                                    .overlay(
+                                //                                        Image(systemName: "pencil.circle.fill")
+                                //                                            .foregroundColor(.green)
+                                //                                            .offset(x: 40, y: 50)
+                                //                                    )
                             case .failure(_):
                                 Image(systemName: "person.circle.fill")
                                     .resizable()
@@ -75,12 +75,12 @@ struct AccountInformationView: View {
                     ], id: \.self) { item in
                         HStack {
                             Image(systemName: item.hasPrefix("School") ? "building.columns" :
-                                             (item.hasPrefix("Major") ? "book" :
-                                             (item.hasPrefix("Phone") ? "phone.fill" : "star")))
-                                .foregroundColor(.white)
-                                .frame(width: 30, height: 30)
-                                .background(darkGreenColor)
-                                .clipShape(Circle())
+                                    (item.hasPrefix("Major") ? "book" :
+                                        (item.hasPrefix("Phone") ? "phone.fill" : "star")))
+                            .foregroundColor(.white)
+                            .frame(width: 30, height: 30)
+                            .background(darkGreenColor)
+                            .clipShape(Circle())
                             Text(item)
                             Spacer()
                             Image(systemName: "chevron.right")

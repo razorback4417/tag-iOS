@@ -21,7 +21,7 @@ struct TripDetailsView: View {
     @State private var hostName = ""
     @State private var joinedUserNames: [String] = []
     @State private var showHostProfile = false
-
+    
     var body: some View {
         VStack(spacing: 20) {
             // Header
@@ -44,7 +44,7 @@ struct TripDetailsView: View {
             .padding(.horizontal, 21)
             .padding(.vertical, 33)
             .background(Color(red: 0.94, green: 0.94, blue: 0.94))
-
+            
             // Trip details card
             VStack(alignment: .leading, spacing: 20) {
                 
@@ -107,7 +107,7 @@ struct TripDetailsView: View {
                         DetailRow(title: "Trip Status", value: "Active")
                     }
                 }
-
+                
                 // Joined Users Section
                 if canViewJoinedUsers {
                     Button(action: {
@@ -124,13 +124,13 @@ struct TripDetailsView: View {
             .cornerRadius(8)
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
             .padding(.horizontal, 21)
-
+            
             Text("Any Questions? FAQ")
                 .font(.custom("BeVietnamPro-Regular", size: 10))
                 .padding(.top, 20)
-
+            
             Spacer()
-
+            
             if isFromActiveTrips {
                 if trip.hostId != Auth.auth().currentUser?.uid && !trip.joinedUsers.contains(Auth.auth().currentUser?.uid ?? "") {
                     Button(action: {
@@ -163,17 +163,17 @@ struct TripDetailsView: View {
                     }
                     .padding(.horizontal, 24)
                     Spacer()
-                    .alert(isPresented: $showingDeleteConfirmation) {
-                        Alert(
-                            title: Text("Delete Trip"),
-                            message: Text("Are you sure you want to delete this trip?"),
-                            primaryButton: .destructive(Text("Delete")) {
-                                tripViewModel.deleteTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "", userViewModel: userViewModel)
-                                presentationMode.wrappedValue.dismiss()
-                            },
-                            secondaryButton: .cancel()
-                        )
-                    }
+                        .alert(isPresented: $showingDeleteConfirmation) {
+                            Alert(
+                                title: Text("Delete Trip"),
+                                message: Text("Are you sure you want to delete this trip?"),
+                                primaryButton: .destructive(Text("Delete")) {
+                                    tripViewModel.deleteTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "", userViewModel: userViewModel)
+                                    presentationMode.wrappedValue.dismiss()
+                                },
+                                secondaryButton: .cancel()
+                            )
+                        }
                 } else if trip.joinedUsers.contains(Auth.auth().currentUser?.uid ?? "") {
                     Button(action: {
                         showingLeaveConfirmation = true
@@ -188,34 +188,20 @@ struct TripDetailsView: View {
                     }
                     .padding(.horizontal, 24)
                     Spacer()
-                    .alert(isPresented: $showingLeaveConfirmation) {
-                        Alert(
-                            title: Text("Leave Trip"),
-                            message: Text("Are you sure you want to leave this trip?"),
-                            primaryButton: .destructive(Text("Leave")) {
-                                tripViewModel.leaveTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "", userViewModel: userViewModel) {
-                                    userViewModel.refreshUserTrips()
-                                    refreshTrigger.toggle()
-                                    presentationMode.wrappedValue.dismiss()
-                                }
-                            },
-                            secondaryButton: .cancel()
-                        )
-                    }
-//                    .alert(isPresented: $showingLeaveConfirmation) {
-//                        Alert(
-//                            title: Text("Leave Trip"),
-//                            message: Text("Are you sure you want to leave this trip?"),
-//                            primaryButton: .destructive(Text("Leave")) {
-//                                tripViewModel.leaveTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "") {
-//                                    userViewModel.refreshUserTrips()
-//                                    refreshTrigger.toggle()
-//                                    presentationMode.wrappedValue.dismiss()
-//                                }
-//                            },
-//                            secondaryButton: .cancel()
-//                        )
-//                    }
+                        .alert(isPresented: $showingLeaveConfirmation) {
+                            Alert(
+                                title: Text("Leave Trip"),
+                                message: Text("Are you sure you want to leave this trip?"),
+                                primaryButton: .destructive(Text("Leave")) {
+                                    tripViewModel.leaveTrip(tripId: trip.id ?? "", userId: Auth.auth().currentUser?.uid ?? "", userViewModel: userViewModel) {
+                                        userViewModel.refreshUserTrips()
+                                        refreshTrigger.toggle()
+                                        presentationMode.wrappedValue.dismiss()
+                                    }
+                                },
+                                secondaryButton: .cancel()
+                            )
+                        }
                 }
             }
         }
@@ -233,18 +219,18 @@ struct TripDetailsView: View {
             }
         }
     }
-
+    
     private var canViewJoinedUsers: Bool {
         let currentUserId = Auth.auth().currentUser?.uid
         return trip.hostId == currentUserId || trip.joinedUsers.contains(currentUserId ?? "")
     }
-
+    
     private func fetchHostName() {
         userViewModel.fetchUserName(userId: trip.hostId) { name in
             self.hostName = name
         }
     }
-
+    
     private func fetchJoinedUserNames() {
         if canViewJoinedUsers {
             userViewModel.fetchUserNames(userIds: trip.joinedUsers) { names in
@@ -252,20 +238,20 @@ struct TripDetailsView: View {
             }
         }
     }
-
+    
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
         formatter.timeStyle = .none
         return formatter.string(from: date)
     }
-
+    
     private func formatTime(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
         return formatter.string(from: date)
     }
-
+    
     private func formatDateShort(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEE, MMM d"
@@ -278,7 +264,7 @@ struct JoinedUsersView: View {
     let joinedUserIds: [String]
     @State private var joinedUserNames: [String] = []
     @State private var isLoading = true
-
+    
     var body: some View {
         Group {
             if isLoading {
@@ -296,7 +282,7 @@ struct JoinedUsersView: View {
         .navigationTitle("Joined Users")
         .onAppear(perform: loadUserNames)
     }
-
+    
     private func loadUserNames() {
         isLoading = true
         userViewModel.fetchUserNames(userIds: joinedUserIds) { names in
@@ -336,10 +322,10 @@ struct DetailRow: View {
 //            distance: "0.2 Miles from your current location",
 //            price: "$6.33"
 //        )
-//        
+//
 //        let mockUserViewModel = UserViewModel()
 //        let mockTripViewModel = TripViewModel()
-//        
+//
 //        return TripDetailsView(isFromActiveTrips: true, trip: mockTrip)
 //            .environmentObject(mockUserViewModel)
 //            .environmentObject(mockTripViewModel)
