@@ -124,29 +124,7 @@ class TripViewModel: ObservableObject {
                 }
             }
     }
-    //
-    //    func fetchActiveTrips(for userId: String) {
-    //        let currentDate = Date()
-    //        db.collection("trips")
-    //            .whereField("date", isGreaterThanOrEqualTo: currentDate)
-    //            .getDocuments { [weak self] (querySnapshot, error) in
-    //                guard let self = self else { return }
-    //                if let error = error {
-    //                    print("Error fetching active trips: \(error)")
-    //                    return
-    //                }
-    //
-    //                self.activeTrips = querySnapshot?.documents.compactMap { document -> TripInfo? in
-    //                    let trip = try? document.data(as: TripInfo.self)
-    //                    return trip?.hostId == userId || trip?.joinedUsers.contains(userId) == true ? trip : nil
-    //                } ?? []
-    //
-    //                DispatchQueue.main.async {
-    //                    self.objectWillChange.send()
-    //                }
-    //            }
-    //    }
-    
+
     func fetchActiveTrips(for userId: String) {
         fetchActiveCreatedTrips(for: userId)
         fetchActiveJoinedTrips(for: userId)
@@ -173,26 +151,6 @@ class TripViewModel: ObservableObject {
             }
     }
     
-//    private func fetchActiveJoinedTrips(for userId: String) {
-//        db.collection("trips")
-//            .whereField("joinedUsers", arrayContains: userId)
-//            .whereField("date", isGreaterThanOrEqualTo: Date())
-//            .order(by: "date", descending: false)
-//            .getDocuments { [weak self] (snapshot, error) in
-//                if let error = error {
-//                    print("Error fetching active joined trips: \(error)")
-//                    return
-//                }
-//                
-//                self?.activeJoinedTrips = snapshot?.documents.compactMap { document -> TripInfo? in
-//                    try? document.data(as: TripInfo.self)
-//                } ?? []
-//                
-//                DispatchQueue.main.async {
-//                    self?.objectWillChange.send()
-//                }
-//            }
-//    }
     
     private func fetchActiveJoinedTrips(for userId: String) {
         db.collection("trips")
@@ -325,26 +283,7 @@ class TripViewModel: ObservableObject {
             completion()
         }
     }
-    
-    //    func deleteTrip(tripId: String, userId: String) {
-    //        db.collection("trips").document(tripId).delete { error in
-    //            if let error = error {
-    //                print("Error deleting trip: \(error.localizedDescription)")
-    //            } else {
-    //                // Remove the trip from the user's createdTrips array
-    //                self.removeUserCreatedTrip(userId: userId, tripId: tripId)
-    //
-    //                // Update the local trips array
-    //                self.trips.removeAll { $0.id == tripId }
-    //                self.fetchUserTrips(userId: userId)
-    //
-    //                // Notify views that the data has changed
-    //                DispatchQueue.main.async {
-    //                    self.objectWillChange.send()
-    //                }
-    //            }
-    //        }
-    //    }
+
     func deleteTrip(tripId: String, userId: String, userViewModel: UserViewModel) {
         db.collection("trips").document(tripId).delete { error in
             if let error = error {

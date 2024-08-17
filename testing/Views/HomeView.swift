@@ -43,7 +43,7 @@ struct HomeView: View {
                 ])
                 
                 // Join a Friend
-                Button(action: { showInviteCodeView = true }) {  // Updated action
+                Button(action: { showInviteCodeView = true }) {
                     JoinFriendView(imageURL: imageURLFriend)
                 }
             }
@@ -53,7 +53,7 @@ struct HomeView: View {
         .sheet(isPresented: $showComingSoon) {
             ComingSoonView()
         }
-        .sheet(isPresented: $showInviteCodeView) {  // New sheet presentation
+        .sheet(isPresented: $showInviteCodeView) {
             InviteCodeView()
         }
     }
@@ -76,8 +76,6 @@ struct SearchBar: View {
 struct RecentPlacesView: View {
     let recentPlaces = [
         ("Evans Hall", "Berkeley, California"),
-//        ("SFO Airport, Terminal One", "San Francisco, California"),
-//        ("Embarcadero Station", "San Francisco, California")
     ]
     
     var body: some View {
@@ -147,11 +145,11 @@ struct SectionView: View {
                             Text(item.description)
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
-                                .lineLimit(2)  // Limit to 2 lines to ensure consistent height
+                                .lineLimit(2)
                         }
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .frame(maxWidth: .infinity)  // This ensures equal width for both items
+                    .frame(maxWidth: .infinity)
                 }
             }
         }

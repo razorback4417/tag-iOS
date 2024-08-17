@@ -121,7 +121,7 @@ struct LoginView: View {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
     }
-
+    
     private func login() {
         userViewModel.signIn(email: email, password: password)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -433,12 +433,6 @@ struct RegistrationView3: View {
     }
     
     private func createAccount() {
-//        guard !paymentMethod.isEmpty else {
-//            alertMessage = "Please enter your preferred payment method"
-//            showingAlert = true
-//            return
-//        }
-        
         userViewModel.finishRegistration()
         path.append("RegistrationConfirmView")
     }

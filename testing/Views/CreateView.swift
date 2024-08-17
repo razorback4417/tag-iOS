@@ -33,7 +33,6 @@ struct CreateView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Progress indicator (only shown for steps 1-4)
                 if currentStep < 5 {
                     HStack(spacing: 10) {
                         ForEach(1...5, id: \.self) { step in
@@ -343,10 +342,8 @@ struct Step2View: View {
                 Spacer().frame(height: 210)
                 if showingPickupResults && !placeViewModel.places.isEmpty {
                     predictionsListView(for: .pickup)
-                    //                        .offset(y: 145)
                 } else if showingDestinationResults && !placeViewModel.places.isEmpty {
                     predictionsListView(for: .destination)
-                    //                        .offset(y: 205) // Adjust this value to position the list correctly
                 }
                 Spacer()
             }
@@ -663,11 +660,3 @@ struct Step5View: View {
         }
     }
 }
-
-//struct CreateView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        CreateView(isPresented: .constant(true), onViewMyTrip: {})
-//            .environmentObject(UserViewModel())
-//            .environmentObject(TripViewModel())
-//    }
-//}
