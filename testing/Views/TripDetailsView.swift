@@ -48,6 +48,23 @@ struct TripDetailsView: View {
             // Trip details card
             VStack(alignment: .leading, spacing: 20) {
                 
+                if trip.isPrivate && trip.hostId == Auth.auth().currentUser?.uid {
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("Invite Code")
+                            .font(.headline)
+                        Text(trip.inviteCode ?? "N/A")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        Text("Share this code with friends to invite them to your trip.")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(10)
+                    .shadow(radius: 5)
+                }
+                
                 HStack {
                     
                     Text("\(trip.from) → \(trip.to)")
@@ -308,26 +325,3 @@ struct DetailRow: View {
         .frame(height: 37)
     }
 }
-
-//struct TripDetailsView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        let mockTrip = TripInfo(
-//            id: "mockId",
-//            hostId: "mockHostId",
-//            from: "Evans Hall",
-//            to: "SFO, Terminal Two",
-//            date: Date(),
-//            joinedUsers: [],
-//            totalSpots: 4,
-//            distance: "0.2 Miles from your current location",
-//            price: "$6.33"
-//        )
-//
-//        let mockUserViewModel = UserViewModel()
-//        let mockTripViewModel = TripViewModel()
-//
-//        return TripDetailsView(isFromActiveTrips: true, trip: mockTrip)
-//            .environmentObject(mockUserViewModel)
-//            .environmentObject(mockTripViewModel)
-//    }
-//}

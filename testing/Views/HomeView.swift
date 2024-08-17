@@ -10,6 +10,7 @@ struct HomeView: View {
     @State private var searchText = ""
     @Binding var showCreateView: Bool
     @State private var showComingSoon = false
+    @State private var showInviteCodeView = false  // New state variable
     var onFindRidesTapped: () -> Void
     
     let imageURLFind = URL(string: "https://images.pexels.com/photos/6268943/pexels-photo-6268943.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")!
@@ -42,7 +43,7 @@ struct HomeView: View {
                 ])
                 
                 // Join a Friend
-                Button(action: { showComingSoon = true }) {
+                Button(action: { showInviteCodeView = true }) {  // Updated action
                     JoinFriendView(imageURL: imageURLFriend)
                 }
             }
@@ -51,6 +52,9 @@ struct HomeView: View {
         .navigationBarHidden(true)
         .sheet(isPresented: $showComingSoon) {
             ComingSoonView()
+        }
+        .sheet(isPresented: $showInviteCodeView) {  // New sheet presentation
+            InviteCodeView()
         }
     }
 }

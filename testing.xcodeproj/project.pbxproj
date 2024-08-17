@@ -26,6 +26,7 @@
 		5484B4262C61DAB400CDF4E9 /* GooglePlaces in Frameworks */ = {isa = PBXBuildFile; productRef = 5484B4252C61DAB400CDF4E9 /* GooglePlaces */; };
 		5484B4282C61DE4300CDF4E9 /* RideHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5484B4272C61DE4300CDF4E9 /* RideHistoryView.swift */; };
 		5484B42A2C61F3B200CDF4E9 /* ComingSoonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5484B4292C61F3B200CDF4E9 /* ComingSoonView.swift */; };
+		5484B42C2C7039CA00CDF4E9 /* InviteCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5484B42B2C7039CA00CDF4E9 /* InviteCodeView.swift */; };
 		548997032C41CD7800F8EE66 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548997022C41CD7800F8EE66 /* LoginView.swift */; };
 		548997602C42678D00F8EE66 /* BeVietnamPro-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5489974E2C42678D00F8EE66 /* BeVietnamPro-Light.ttf */; };
 		548997612C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5489974F2C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf */; };
@@ -98,6 +99,7 @@
 		5472DE562C5EA7E6000FC4B5 /* PlaceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceViewModel.swift; sourceTree = "<group>"; };
 		5484B4272C61DE4300CDF4E9 /* RideHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideHistoryView.swift; sourceTree = "<group>"; };
 		5484B4292C61F3B200CDF4E9 /* ComingSoonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComingSoonView.swift; sourceTree = "<group>"; };
+		5484B42B2C7039CA00CDF4E9 /* InviteCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteCodeView.swift; sourceTree = "<group>"; };
 		548997022C41CD7800F8EE66 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		5489974E2C42678D00F8EE66 /* BeVietnamPro-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BeVietnamPro-Light.ttf"; sourceTree = "<group>"; };
 		5489974F2C42678D00F8EE66 /* BeVietnamPro-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BeVietnamPro-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
@@ -308,6 +310,7 @@
 				54F4B4902C5B8C5100B1BE31 /* UserProfileView.swift */,
 				5484B4272C61DE4300CDF4E9 /* RideHistoryView.swift */,
 				5484B4292C61F3B200CDF4E9 /* ComingSoonView.swift */,
+				5484B42B2C7039CA00CDF4E9 /* InviteCodeView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -509,6 +512,7 @@
 				548997872C42860B00F8EE66 /* HomeView.swift in Sources */,
 				54172D782C4BC04D00198E7D /* TripDetailsView.swift in Sources */,
 				54172D722C4BA22600198E7D /* MyTripsView.swift in Sources */,
+				5484B42C2C7039CA00CDF4E9 /* InviteCodeView.swift in Sources */,
 				5489978D2C49819A00F8EE66 /* CreateView.swift in Sources */,
 				54172D8E2C4C79E100198E7D /* UserViewModel.swift in Sources */,
 				548997832C42856000F8EE66 /* MainTabView.swift in Sources */,

@@ -43,6 +43,73 @@ class TripViewModel: ObservableObject {
         }
     }
     
+    func joinTripByInviteCode(inviteCode: String, userId: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        db.collection("trips").whereField("inviteCode", isEqualTo: inviteCode).getDocuments { (querySnapshot, error) in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let document = querySnapshot?.documents.first else {
+                completion(.failure(NSError(domain: "TripViewModel", code: 0, userInfo: [NSLocalizedDescriptionKey: "No trip found with this invite code."])))
+                return
+            }
+            
+            let tripId = document.documentID
+            self.joinTrip(tripId: tripId, userId: userId, inviteCode: inviteCode) { error in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success(()))
+                }
+            }
+        }
+    }
+    
+    func joinTrip(tripId: String, userId: String, inviteCode: String? = nil, completion: @escaping (Error?) -> Void) {
+        db.collection("trips").document(tripId).getDocument { (document, error) in
+            if let error = error {
+                completion(error)
+                return
+            }
+            
+            guard let document = document, document.exists else {
+                completion(NSError(domain: "TripViewModel", code: 1, userInfo: [NSLocalizedDescriptionKey: "Trip not found."]))
+                return
+            }
+            
+            do {
+                let trip = try document.data(as: TripInfo.self)
+                if trip.isPrivate {
+                    if inviteCode == trip.inviteCode {
+                        self.addUserToTrip(tripId: tripId, userId: userId, completion: completion)
+                    } else {
+                        completion(NSError(domain: "TripViewModel", code: 2, userInfo: [NSLocalizedDescriptionKey: "Invalid invite code."]))
+                    }
+                } else {
+                    self.addUserToTrip(tripId: tripId, userId: userId, completion: completion)
+                }
+            } catch {
+                completion(error)
+            }
+        }
+    }
+    
+    private func addUserToTrip(tripId: String, userId: String, completion: @escaping (Error?) -> Void) {
+        db.collection("trips").document(tripId).updateData([
+            "joinedUsers": FieldValue.arrayUnion([userId])
+        ]) { error in
+            if let error = error {
+                completion(error)
+            } else {
+                self.updateUserJoinedTrips(userId: userId, tripId: tripId)
+                self.fetchAllTrips()
+                self.objectWillChange.send()
+                completion(nil)
+            }
+        }
+    }
+    
     func fetchAllTrips() {
         let currentDate = Date()
         db.collection("trips")
