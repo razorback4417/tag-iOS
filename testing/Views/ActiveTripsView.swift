@@ -12,6 +12,8 @@ struct ActiveTripsView: View {
     @EnvironmentObject var tripViewModel: TripViewModel
     @State private var showCreateView = false
     
+    @State private var refreshTrigger = false
+    
     var body: some View {
         ZStack {
             Color(red: 0.94, green: 0.94, blue: 0.94).edgesIgnoringSafeArea(.all)
@@ -36,7 +38,7 @@ struct ActiveTripsView: View {
                 ScrollView {
                     VStack(spacing: 15) {
                         ForEach(tripViewModel.searchResults) { trip in
-                            NavigationLink(destination: TripDetailsView(isFromActiveTrips: true, trip: trip)) {
+                            NavigationLink(destination: TripDetailsView(isFromActiveTrips: true, trip: trip, refreshTrigger: $refreshTrigger)) {
                                 ActiveTripCard(trip: trip)
                             }
                         }

@@ -13,10 +13,10 @@ struct ComingSoonView: View {
             Color(red: 0.94, green: 0.94, blue: 0.94).edgesIgnoringSafeArea(.all)
             
             VStack(alignment: .leading, spacing: 20) {
-                    Text("Coming soon!")
-                        .font(.custom("BeVietnamPro-Regular", size: 16))
-                        .foregroundColor(.gray)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                Text("Coming soon!")
+                    .font(.custom("BeVietnamPro-Regular", size: 16))
+                    .foregroundColor(.gray)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .padding()
         }

@@ -13,6 +13,8 @@ struct SettingsView: View {
     @State private var showRideHistory = false
     @State private var showComingSoon = false
     
+    @State private var showDeleteAccountAlert = false
+    
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -48,10 +50,42 @@ struct SettingsView: View {
                             .cornerRadius(8)
                     }
                     .padding(.top, 20)
+                    
+                    Button(action: {
+                        showDeleteAccountAlert = true
+                    }) {
+                        Text("Delete Account")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 44)
+                            .background(Color.red)
+                            .cornerRadius(8)
+                    }
+                    .padding(.top, 10)
+                    
                 }
                 .padding()
             }
             .background(Color.white)
+            .alert(isPresented: $showDeleteAccountAlert) {
+                Alert(
+                    title: Text("Delete Account"),
+                    message: Text("Are you sure you want to delete your account? This action cannot be undone."),
+                    primaryButton: .destructive(Text("Delete")) {
+                        userViewModel.deleteAccount { result in
+                            switch result {
+                            case .success:
+                                presentationMode.wrappedValue.dismiss()
+                            case .failure(let error):
+                                print("Error deleting account: \(error.localizedDescription)")
+                                // You might want to show an error alert here
+                            }
+                        }
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
             .sheet(isPresented: $showAccountInfo) {
                 AccountInformationView()
                     .environmentObject(userViewModel)

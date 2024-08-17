@@ -26,11 +26,26 @@ class UserViewModel: ObservableObject {
     @Published var user: User?
     @Published var isLoggedIn = false
     @Published var registrationData: RegistrationData?
-    
     private var db = Firestore.firestore()
+    
+    @Published var userTrips: (created: [TripInfo], joined: [TripInfo]) = ([], [])
     
     init() {
         checkUserStatus()
+    }
+    
+    func refreshUserTrips() {
+        fetchUserTrips { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let trips):
+                    self?.userTrips = trips
+                    self?.objectWillChange.send()
+                case .failure(let error):
+                    print("Failed to refresh user trips: \(error.localizedDescription)")
+                }
+            }
+        }
     }
     
     func checkUserStatus() {
@@ -55,6 +70,20 @@ class UserViewModel: ObservableObject {
             self.isLoggedIn = true
             if let userId = result?.user.uid {
                 self.fetchUserData(userId: userId)
+            }
+        }
+    }
+    
+    func signIn(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        Auth.auth().signIn(withEmail: email, password: password) { [weak self] result, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                self?.isLoggedIn = true
+                if let userId = result?.user.uid {
+                    self?.fetchUserData(userId: userId)
+                }
+                completion(.success(()))
             }
         }
     }
@@ -144,7 +173,7 @@ class UserViewModel: ObservableObject {
             }
         }
     }
-//    RYNfFRXhsfYPfKlIhpYXWI286TM2
+    //    RYNfFRXhsfYPfKlIhpYXWI286TM2
     
     func updateUserData(userData: User) {
         guard let userId = Auth.auth().currentUser?.uid else { return }
@@ -157,9 +186,11 @@ class UserViewModel: ObservableObject {
         }
     }
     
+    
     func fetchUserTrips(completion: @escaping (Result<(created: [TripInfo], joined: [TripInfo]), Error>) -> Void) {
-        guard let userId = Auth.auth().currentUser?.uid else {
-            completion(.failure(NSError(domain: "UserViewModel", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not logged in"])))
+        print("fetching user trips")
+        guard let user = self.user, let userId = user.id else {
+            completion(.failure(NSError(domain: "UserViewModel", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not logged in or user data not available"])))
             return
         }
         
@@ -168,24 +199,24 @@ class UserViewModel: ObservableObject {
         var joinedTrips: [TripInfo] = []
         var fetchError: Error?
         
-        // Fetch created trips
         dispatchGroup.enter()
-        db.collection("trips").whereField("hostId", isEqualTo: userId).getDocuments { (querySnapshot, error) in
-            if let error = error {
+        self.fetchTrips(ids: user.createdTrips) { result in
+            switch result {
+            case .success(let trips):
+                createdTrips = trips
+            case .failure(let error):
                 fetchError = error
-            } else {
-                createdTrips = querySnapshot?.documents.compactMap { try? $0.data(as: TripInfo.self) } ?? []
             }
             dispatchGroup.leave()
         }
         
-        // Fetch joined trips
         dispatchGroup.enter()
-        db.collection("trips").whereField("joinedUsers", arrayContains: userId).getDocuments { (querySnapshot, error) in
-            if let error = error {
+        self.fetchTrips(ids: user.joinedTrips) { result in
+            switch result {
+            case .success(let trips):
+                joinedTrips = trips
+            case .failure(let error):
                 fetchError = error
-            } else {
-                joinedTrips = querySnapshot?.documents.compactMap { try? $0.data(as: TripInfo.self) } ?? []
             }
             dispatchGroup.leave()
         }
@@ -194,7 +225,35 @@ class UserViewModel: ObservableObject {
             if let error = fetchError {
                 completion(.failure(error))
             } else {
-                completion(.success((created: createdTrips, joined: joinedTrips)))
+                let result = (created: createdTrips, joined: joinedTrips)
+                completion(.success(result))
+            }
+        }
+    }
+    
+    private func fetchTrips(ids: [String], completion: @escaping (Result<[TripInfo], Error>) -> Void) {
+        let group = DispatchGroup()
+        var trips: [TripInfo] = []
+        var fetchError: Error?
+        
+        for id in ids {
+            group.enter()
+            db.collection("trips").document(id).getDocument { (document, error) in
+                if let error = error {
+                    fetchError = error
+                } else if let document = document, document.exists,
+                          let trip = try? document.data(as: TripInfo.self) {
+                    trips.append(trip)
+                }
+                group.leave()
+            }
+        }
+        
+        group.notify(queue: .main) {
+            if let error = fetchError {
+                completion(.failure(error))
+            } else {
+                completion(.success(trips))
             }
         }
     }
@@ -212,11 +271,11 @@ extension UserViewModel {
             }
         }
     }
-
+    
     func fetchUserNames(userIds: [String], completion: @escaping ([String]) -> Void) {
         let group = DispatchGroup()
         var names: [String] = []
-
+        
         for userId in userIds {
             group.enter()
             fetchUserName(userId: userId) { name in
@@ -224,9 +283,36 @@ extension UserViewModel {
                 group.leave()
             }
         }
-
+        
         group.notify(queue: .main) {
             completion(names)
+        }
+    }
+    
+    func deleteAccount(completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            completion(.failure(NSError(domain: "UserViewModel", code: 0, userInfo: [NSLocalizedDescriptionKey: "No user logged in"])))
+            return
+        }
+        
+        let userId = user.uid
+        
+        // Delete user data from Firestore
+        db.collection("users").document(userId).delete { [weak self] error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            // Delete user authentication
+            user.delete { error in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    self?.signOut()
+                    completion(.success(()))
+                }
+            }
         }
     }
 }

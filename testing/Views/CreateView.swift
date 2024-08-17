@@ -59,7 +59,15 @@ struct CreateView: View {
                     case 4:
                         Step4View(currentStep: $currentStep, createTripInfo: createTripInfo)
                     case 5:
-                        Step5View(currentStep: $currentStep, onViewMyTrip: onViewMyTrip)
+                        Step5View(
+                            currentStep: $currentStep,
+                            onViewMyTrip: onViewMyTrip,
+                            tripInfo: tripInfo,
+                            createTrip: { tripInfo in
+                                tripViewModel.createTrip(tripInfo)
+                                userViewModel.refreshUserTrips()
+                            }
+                        )
                     default:
                         EmptyView()
                     }
@@ -154,22 +162,11 @@ struct Step1View: View {
             .padding(.horizontal, 24)
             
             VStack(spacing: 10) {
-                        SelectionButton(title: "Just me", subtitle: "Find other verified students to share the ride with", isSelected: selection == "Just me", action: { selection = "Just me" })
-                        
-                        SelectionButton(title: "Friends", subtitle: "Create a private trip with an invite code to send out", isSelected: selection == "Friends", action: { selection = "Friends" })
-                    }
+                SelectionButton(title: "Just me", subtitle: "Find other verified students to share the ride with", isSelected: selection == "Just me", action: { selection = "Just me" })
+                
+                SelectionButton(title: "Friends", subtitle: "Create a private trip with an invite code to send out", isSelected: selection == "Friends", action: { selection = "Friends" })
+            }
             .padding(.horizontal, 24)
-
-//            if selection == "Just me", let user = userViewModel.user {
-//                VStack(alignment: .leading, spacing: 10) {
-//                    Text("Host Information")
-//                        .font(.headline)
-//                    
-//                    Text("Name: \(user.firstName) \(user.lastName)")
-//                    Text("Phone: \(user.phoneNumber)")
-//                }
-//                .padding(.horizontal, 24)
-//            }
             
             Spacer()
             
@@ -250,7 +247,7 @@ struct Step2View: View {
                     showingPickupResults = false
                     showingDestinationResults = false
                 }
-
+            
             VStack(alignment: .leading, spacing: 20) {
                 // Header
                 VStack(alignment: .leading, spacing: 5) {
@@ -276,7 +273,7 @@ struct Step2View: View {
                             .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                         TextField("Pickup location", text: $pickupLocation)
                             .font(.custom("BeVietnamPro-Regular", size: 14))
-                            .onChange(of: pickupLocation) { newValue in
+                            .onChange(of: pickupLocation) { oldValue, newValue in
                                 placeViewModel.searchAddress(newValue)
                                 showingPickupResults = true
                                 showingDestinationResults = false
@@ -285,14 +282,14 @@ struct Step2View: View {
                     .padding()
                     .background(Color(red: 0.95, green: 0.95, blue: 0.95))
                     .cornerRadius(8)
-
+                    
                     // Destination input
                     HStack {
                         Image(systemName: "mappin.and.ellipse")
                             .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                         TextField("Destination", text: $destination)
                             .font(.custom("BeVietnamPro-Regular", size: 14))
-                            .onChange(of: destination) { newValue in
+                            .onChange(of: destination) { oldValue, newValue in
                                 placeViewModel.searchAddress(newValue)
                                 showingDestinationResults = true
                                 showingPickupResults = false
@@ -335,10 +332,10 @@ struct Step2View: View {
                 Spacer().frame(height: 210)
                 if showingPickupResults && !placeViewModel.places.isEmpty {
                     predictionsListView(for: .pickup)
-//                        .offset(y: 145)
+                    //                        .offset(y: 145)
                 } else if showingDestinationResults && !placeViewModel.places.isEmpty {
                     predictionsListView(for: .destination)
-//                        .offset(y: 205) // Adjust this value to position the list correctly
+                    //                        .offset(y: 205) // Adjust this value to position the list correctly
                 }
                 Spacer()
             }
@@ -611,6 +608,8 @@ struct TripDetailRow: View {
 struct Step5View: View {
     @Binding var currentStep: Int
     var onViewMyTrip: () -> Void
+    var tripInfo: TripInfo?
+    var createTrip: (TripInfo) -> Void
     
     var body: some View {
         VStack(spacing: 20) {
@@ -634,6 +633,9 @@ struct Step5View: View {
             Spacer()
             
             Button(action: {
+                if let tripInfo = tripInfo {
+                    createTrip(tripInfo)
+                }
                 print("Navigating to My Trips")
                 onViewMyTrip()
             }) {
@@ -658,6 +660,3 @@ struct CreateView_Previews: PreviewProvider {
             .environmentObject(TripViewModel())
     }
 }
-
-
-//

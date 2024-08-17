@@ -24,7 +24,9 @@ struct SearchView: View {
     @State private var showingPickupResults = false
     @State private var showingDestinationResults = false
     @State private var showSettings = false
-
+    
+    @State private var refreshTrigger = false
+    
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d, yyyy"
@@ -39,107 +41,23 @@ struct SearchView: View {
                 ScrollView {
                     VStack(spacing: 20) {
                         // Header
-                        HStack(alignment: .top, spacing: 12) {
-                            AsyncImage(url: URL(string: "https://images.pexels.com/photos/6273480/pexels-photo-6273480.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")) { phase in
-                                switch phase {
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 52, height: 52)
-                                        .clipShape(Circle())
-                                case .failure(_):
-                                    Image(systemName: "person.circle.fill")
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(width: 52, height: 52)
-                                        .foregroundColor(.gray)
-                                case .empty:
-                                    ProgressView()
-                                        .frame(width: 52, height: 52)
-                                @unknown default:
-                                    EmptyView()
-                                }
-                            }
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Hello \(userViewModel.user?.firstName ?? "there") 👋")
-                                    .font(.custom("Be Vietnam Pro", size: 12))
-                                    .foregroundColor(.black)
-                                
-                                Text("Where are you going?")
-                                    .font(.custom("Be Vietnam Pro", size: 21).weight(.semibold))
-                                    .foregroundColor(.black)
-                            }
-                            
-                            Spacer()
-                            
-                            Button(action: {
-                                showSettings = true
-                            }) {
-                                Image(systemName: "gearshape")
-                                    .foregroundColor(.black)
-                                    .frame(width: 24, height: 24)
-                                    .padding(6)
-                                    .background(Color.black.opacity(0.1))
-                                    .clipShape(Circle())
-                            }
-                        }
-                        .padding(.horizontal)
+                        headerView()
                         
                         // Trip Info Card
                         VStack(spacing: 16) {
-                            Text("Trip-Info")
+                            Text("Search for Trips")
                                 .font(.custom("Manrope", size: 12).weight(.semibold))
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 16)
                             
                             VStack(spacing: 12) {
-                                // Pickup location input
                                 locationInputField(title: "Pickup location", text: $pickupLocation, isPickup: true)
-                                
-                                // Destination input
                                 locationInputField(title: "Destination", text: $destination, isPickup: false)
-   
-                                HStack {
-                                    Image(systemName: "calendar")
-                                        .foregroundColor(.gray)
-                                    DatePicker("", selection: $date, displayedComponents: .date)
-                                        .labelsHidden()
-                                        .font(.custom("Be Vietnam Pro", size: 16))
-                                    Spacer()
-                                    Text(dateFormatter.string(from: date))
-                                        .font(.custom("Be Vietnam Pro", size: 16))
-                                        .foregroundColor(.gray)
-                                }
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
+                                datePickerField()
                             }
                             
-                            Button(action: {
-                                print("Searching now")
-                                performSearch()
-                            }) {
-                                Text("Search")
-                                    .font(.custom("Be Vietnam Pro", size: 16).weight(.medium))
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color(red: 0.06, green: 0.36, blue: 0.22))
-                                    .cornerRadius(8)
-                            }
-                            
-                            Button(action: {
-                                showMyTrips = true
-                            }) {
-                                Text("My Trips")
-                                    .font(.custom("Be Vietnam Pro", size: 16).weight(.medium))
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color(red: 0.06, green: 0.36, blue: 0.22))
-                                    .cornerRadius(8)
-                            }
+                            searchButton()
+                            myTripsButton()
                         }
                         .padding()
                         .background(Color.white)
@@ -150,8 +68,8 @@ struct SearchView: View {
                         Spacer()
                         
                         NavigationLink(destination: ActiveTripsView().environmentObject(tripViewModel), isActive: $navigateToActiveTrips) {
-                           EmptyView()
-                       }
+                            EmptyView()
+                        }
                     }
                     .padding(.top, 60)
                 }
@@ -163,17 +81,7 @@ struct SearchView: View {
                 )
                 
                 // Prediction results overlay
-                VStack {
-                    Spacer().frame(height: 240)
-                    if showingPickupResults {
-                        predictionResultsView(for: $pickupLocation, showResults: $showingPickupResults)
-                    } else if showingDestinationResults {
-                        predictionResultsView(for: $destination, showResults: $showingDestinationResults)
-                    }
-                    Spacer()
-                }
-                .zIndex(1)
-                
+                predictionResultsOverlay()
             }
             .navigationDestination(isPresented: $showSettings) {
                 SettingsView()
@@ -182,18 +90,131 @@ struct SearchView: View {
                 ActiveTripsView()
             }
             .navigationDestination(isPresented: $showMyTrips) {
-                MyTripsView()
+                MyTripsView(refreshTrigger: $refreshTrigger)
                     .environmentObject(userViewModel)
             }
         }
     }
+    
+    private func headerView() -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            AsyncImage(url: URL(string: "https://images.pexels.com/photos/6273480/pexels-photo-6273480.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 52, height: 52)
+                        .clipShape(Circle())
+                case .failure(_):
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 52, height: 52)
+                        .foregroundColor(.gray)
+                case .empty:
+                    ProgressView()
+                        .frame(width: 52, height: 52)
+                @unknown default:
+                    EmptyView()
+                }
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Hello \(userViewModel.user?.firstName ?? "there") 👋")
+                    .font(.custom("Be Vietnam Pro", size: 12))
+                    .foregroundColor(.black)
+                
+                Text("Where are you going?")
+                    .font(.custom("Be Vietnam Pro", size: 21).weight(.semibold))
+                    .foregroundColor(.black)
+            }
+            
+            Spacer()
+            
+            Button(action: {
+                showSettings = true
+            }) {
+                Image(systemName: "gearshape")
+                    .foregroundColor(.black)
+                    .frame(width: 24, height: 24)
+                    .padding(6)
+                    .background(Color.black.opacity(0.1))
+                    .clipShape(Circle())
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    private func datePickerField() -> some View {
+        HStack {
+            Image(systemName: "calendar")
+                .foregroundColor(.gray)
+            DatePicker("Select Date", selection: $date, displayedComponents: .date)
+                .labelsHidden()
+                .onTapGesture(count: 99) {
+                    // empty gesture with a high count overrides the default gesture
+                }
+            Spacer()
+            Text(dateFormatter.string(from: date))
+                .font(.custom("Be Vietnam Pro", size: 16))
+                .foregroundColor(.gray)
+        }
+        .padding()
+        .background(Color(red: 0.95, green: 0.95, blue: 0.95))
+        .cornerRadius(8)
+    }
+    
+    private func searchButton() -> some View {
+        Button(action: {
+            print("Searching now")
+            Task {
+                await performSearch()
+            }
+        }) {
+            Text("Search")
+                .font(.custom("Be Vietnam Pro", size: 16).weight(.medium))
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color(red: 0.06, green: 0.36, blue: 0.22))
+                .cornerRadius(8)
+        }
+    }
+    
+    private func myTripsButton() -> some View {
+        Button(action: {
+            showMyTrips = true
+        }) {
+            Text("My Trips")
+                .font(.custom("Be Vietnam Pro", size: 16).weight(.medium))
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color(red: 0.06, green: 0.36, blue: 0.22))
+                .cornerRadius(8)
+        }
+    }
+    
+    private func predictionResultsOverlay() -> some View {
+        VStack {
+            Spacer().frame(height: 240)
+            if showingPickupResults {
+                predictionResultsView(for: $pickupLocation, showResults: $showingPickupResults)
+            } else if showingDestinationResults {
+                predictionResultsView(for: $destination, showResults: $showingDestinationResults)
+            }
+            Spacer()
+        }
+        .zIndex(1)
+    }
+    
     func locationInputField(title: String, text: Binding<String>, isPickup: Bool) -> some View {
         HStack {
             Image(systemName: isPickup ? "mappin.circle.fill" : "mappin.and.ellipse")
                 .foregroundColor(.gray)
             TextField(title, text: text)
-                .font(.custom("Be Vietnam Pro", size: 16))
-                .onChange(of: text.wrappedValue) { newValue in
+                .font(.custom("Be Vietnam Pro", size: 14))
+                .onChange(of: text.wrappedValue) { oldValue, newValue in
                     placeViewModel.searchAddress(newValue)
                     if isPickup {
                         showingPickupResults = true
@@ -237,15 +258,14 @@ struct SearchView: View {
         }
     }
     
-    private func performSearch() {
+    private func performSearch() async {
         print("Performing Search")
         print("Pickup Location: '\(pickupLocation)'")
         print("Destination: '\(destination)'")
         print("Date: \(dateFormatter.string(from: date))")
-        tripViewModel.searchTrips(from: pickupLocation, to: destination)
+        await tripViewModel.searchTrips(from: pickupLocation, to: destination)
         print("Search initiated")
         
-        // Navigate immediately
         DispatchQueue.main.async {
             self.navigateToActiveTrips = true
         }
@@ -254,10 +274,11 @@ struct SearchView: View {
 
 struct SearchResultsView: View {
     let trips: [TripInfo]
+    @State private var refreshTrigger = false
     
     var body: some View {
         List(trips) { trip in
-            NavigationLink(destination: TripDetailsView(isFromActiveTrips: true, trip: trip)) {
+            NavigationLink(destination: TripDetailsView(isFromActiveTrips: true, trip: trip, refreshTrigger: $refreshTrigger)) {
                 TripCard(trip: trip)
             }
         }
