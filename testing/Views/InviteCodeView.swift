@@ -17,32 +17,43 @@ struct InviteCodeView: View {
     var body: some View {
         VStack(spacing: 20) {
             Text("Enter Invite Code")
-                .font(.title)
-                .fontWeight(.bold)
+                .font(.custom("BeVietnamPro-Regular", size: 28).weight(.bold))
             
             Text("Have your friend share the invite code with you and paste it below.")
-                .font(.subheadline)
-                .foregroundColor(.gray)
+                .font(.custom("BeVietnamPro-Regular", size: 14))
+                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             
-            TextField("Invite Code", text: $inviteCode)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
+            HStack {
+                Image(systemName: "key.fill")
+                    .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                    .padding(.leading, 12)
+                
+                TextField("Invite Code", text: $inviteCode)
+                    .font(.custom("BeVietnamPro-Regular", size: 16))
+                    .padding(.vertical, 12)
+            }
+            .background(Color(red: 0.95, green: 0.95, blue: 0.95))
+            .cornerRadius(8)
+            .padding(.horizontal)
             
             if let errorMessage = errorMessage {
                 Text(errorMessage)
                     .foregroundColor(.red)
-                    .font(.caption)
+                    .font(.custom("BeVietnamPro-Regular", size: 12))
             }
             
-            Button("Join Trip") {
-                joinTrip()
+            Button(action: joinTrip) {
+                Text("Join Trip")
+                    .font(.custom("BeVietnamPro-Regular", size: 15).weight(.bold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 53)
+                    .background(Color(red: 0.06, green: 0.36, blue: 0.22))
+                    .cornerRadius(8)
             }
-            .padding()
-            .background(Color(red: 0.06, green: 0.36, blue: 0.22))
-            .foregroundColor(.white)
-            .cornerRadius(10)
+            .padding(.horizontal)
         }
         .padding()
     }
@@ -62,8 +73,4 @@ struct InviteCodeView: View {
             }
         }
     }
-}
-
-#Preview {
-    InviteCodeView()
 }

@@ -49,20 +49,26 @@ struct TripDetailsView: View {
             VStack(alignment: .leading, spacing: 20) {
                 
                 if trip.isPrivate && trip.hostId == Auth.auth().currentUser?.uid {
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text("Invite Code")
-                            .font(.headline)
-                        Text(trip.inviteCode ?? "N/A")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        Text("Share this code with friends to invite them to your trip.")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                    HStack {
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("Invite Code")
+                                .font(.custom("BeVietnamPro-Regular", size: 14).weight(.medium))
+                                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                            Text(trip.inviteCode ?? "N/A")
+                                .font(.custom("BeVietnamPro-Regular", size: 18).weight(.bold))
+                                .foregroundColor(Color(red: 0.07, green: 0.36, blue: 0.22))
+                        }
+                        Spacer()
+                        Button(action: {
+                            UIPasteboard.general.string = trip.inviteCode
+                        }) {
+                            Image(systemName: "doc.on.doc")
+                                .foregroundColor(Color(red: 0.07, green: 0.36, blue: 0.22))
+                        }
                     }
                     .padding()
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .shadow(radius: 5)
+                    .background(Color(red: 0.94, green: 0.96, blue: 0.95))
+                    .cornerRadius(8)
                 }
                 
                 HStack {
