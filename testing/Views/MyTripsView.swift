@@ -57,7 +57,6 @@ struct MyTripsView: View {
                                     .font(.custom("Manrope-Regular", size: 15).weight(.bold))
                                     .padding(.leading)
                                 
-                                //                                ForEach(userViewModel.userTrips.created) { trip in
                                 ForEach(tripViewModel.activeCreatedTrips) { trip in
                                     NavigationLink(destination: TripDetailsView(isFromActiveTrips: false, trip: trip, refreshTrigger: $refreshTrigger)) {
                                         TripCard(trip: trip)
@@ -70,7 +69,6 @@ struct MyTripsView: View {
                                     .font(.custom("Manrope-Regular", size: 15).weight(.bold))
                                     .padding(.leading)
                                 
-                                //                                ForEach(userViewModel.userTrips.joined) { trip in
                                 ForEach(tripViewModel.activeJoinedTrips) { trip in
                                     NavigationLink(destination: TripDetailsView(isFromActiveTrips: false, trip: trip, refreshTrigger: $refreshTrigger)) {
                                         TripCard(trip: trip)
@@ -95,24 +93,6 @@ struct MyTripsView: View {
         }
     }
     
-    //    private func loadTrips() {
-    //        isLoading = true
-    //        errorMessage = nil
-    //
-    //        userViewModel.fetchUserTrips { result in
-    //            DispatchQueue.main.async {
-    //                self.isLoading = false
-    //                switch result {
-    //                case .success:
-    //                    // The userTrips property in userViewModel is already updated
-    //                    break
-    //                case .failure(let error):
-    //                    self.errorMessage = "Failed to load trips: \(error.localizedDescription)"
-    //                }
-    //            }
-    //        }
-    //    }
-    
     private func loadTrips() {
         isLoading = true
         errorMessage = nil
@@ -125,7 +105,6 @@ struct MyTripsView: View {
         
         tripViewModel.fetchActiveTrips(for: userId)
         
-        // Use a DispatchQueue to check if the trips have been loaded after a short delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // 1 second delay
             if self.tripViewModel.activeCreatedTrips.isEmpty && self.tripViewModel.activeJoinedTrips.isEmpty {
                 // If both arrays are still empty after the delay, assume an error occurred

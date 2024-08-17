@@ -43,6 +43,73 @@ class TripViewModel: ObservableObject {
         }
     }
     
+    func joinTripByInviteCode(inviteCode: String, userId: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        db.collection("trips").whereField("inviteCode", isEqualTo: inviteCode).getDocuments { (querySnapshot, error) in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let document = querySnapshot?.documents.first else {
+                completion(.failure(NSError(domain: "TripViewModel", code: 0, userInfo: [NSLocalizedDescriptionKey: "No trip found with this invite code."])))
+                return
+            }
+            
+            let tripId = document.documentID
+            self.joinTrip(tripId: tripId, userId: userId, inviteCode: inviteCode) { error in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success(()))
+                }
+            }
+        }
+    }
+    
+    func joinTrip(tripId: String, userId: String, inviteCode: String? = nil, completion: @escaping (Error?) -> Void) {
+        db.collection("trips").document(tripId).getDocument { (document, error) in
+            if let error = error {
+                completion(error)
+                return
+            }
+            
+            guard let document = document, document.exists else {
+                completion(NSError(domain: "TripViewModel", code: 1, userInfo: [NSLocalizedDescriptionKey: "Trip not found."]))
+                return
+            }
+            
+            do {
+                let trip = try document.data(as: TripInfo.self)
+                if trip.isPrivate {
+                    if inviteCode == trip.inviteCode {
+                        self.addUserToTrip(tripId: tripId, userId: userId, completion: completion)
+                    } else {
+                        completion(NSError(domain: "TripViewModel", code: 2, userInfo: [NSLocalizedDescriptionKey: "Invalid invite code."]))
+                    }
+                } else {
+                    self.addUserToTrip(tripId: tripId, userId: userId, completion: completion)
+                }
+            } catch {
+                completion(error)
+            }
+        }
+    }
+    
+    private func addUserToTrip(tripId: String, userId: String, completion: @escaping (Error?) -> Void) {
+        db.collection("trips").document(tripId).updateData([
+            "joinedUsers": FieldValue.arrayUnion([userId])
+        ]) { error in
+            if let error = error {
+                completion(error)
+            } else {
+                self.updateUserJoinedTrips(userId: userId, tripId: tripId)
+                self.fetchAllTrips()
+                self.objectWillChange.send()
+                completion(nil)
+            }
+        }
+    }
+    
     func fetchAllTrips() {
         let currentDate = Date()
         db.collection("trips")
@@ -57,29 +124,7 @@ class TripViewModel: ObservableObject {
                 }
             }
     }
-    //
-    //    func fetchActiveTrips(for userId: String) {
-    //        let currentDate = Date()
-    //        db.collection("trips")
-    //            .whereField("date", isGreaterThanOrEqualTo: currentDate)
-    //            .getDocuments { [weak self] (querySnapshot, error) in
-    //                guard let self = self else { return }
-    //                if let error = error {
-    //                    print("Error fetching active trips: \(error)")
-    //                    return
-    //                }
-    //
-    //                self.activeTrips = querySnapshot?.documents.compactMap { document -> TripInfo? in
-    //                    let trip = try? document.data(as: TripInfo.self)
-    //                    return trip?.hostId == userId || trip?.joinedUsers.contains(userId) == true ? trip : nil
-    //                } ?? []
-    //
-    //                DispatchQueue.main.async {
-    //                    self.objectWillChange.send()
-    //                }
-    //            }
-    //    }
-    
+
     func fetchActiveTrips(for userId: String) {
         fetchActiveCreatedTrips(for: userId)
         fetchActiveJoinedTrips(for: userId)
@@ -106,26 +151,6 @@ class TripViewModel: ObservableObject {
             }
     }
     
-//    private func fetchActiveJoinedTrips(for userId: String) {
-//        db.collection("trips")
-//            .whereField("joinedUsers", arrayContains: userId)
-//            .whereField("date", isGreaterThanOrEqualTo: Date())
-//            .order(by: "date", descending: false)
-//            .getDocuments { [weak self] (snapshot, error) in
-//                if let error = error {
-//                    print("Error fetching active joined trips: \(error)")
-//                    return
-//                }
-//                
-//                self?.activeJoinedTrips = snapshot?.documents.compactMap { document -> TripInfo? in
-//                    try? document.data(as: TripInfo.self)
-//                } ?? []
-//                
-//                DispatchQueue.main.async {
-//                    self?.objectWillChange.send()
-//                }
-//            }
-//    }
     
     private func fetchActiveJoinedTrips(for userId: String) {
         db.collection("trips")
@@ -258,26 +283,7 @@ class TripViewModel: ObservableObject {
             completion()
         }
     }
-    
-    //    func deleteTrip(tripId: String, userId: String) {
-    //        db.collection("trips").document(tripId).delete { error in
-    //            if let error = error {
-    //                print("Error deleting trip: \(error.localizedDescription)")
-    //            } else {
-    //                // Remove the trip from the user's createdTrips array
-    //                self.removeUserCreatedTrip(userId: userId, tripId: tripId)
-    //
-    //                // Update the local trips array
-    //                self.trips.removeAll { $0.id == tripId }
-    //                self.fetchUserTrips(userId: userId)
-    //
-    //                // Notify views that the data has changed
-    //                DispatchQueue.main.async {
-    //                    self.objectWillChange.send()
-    //                }
-    //            }
-    //        }
-    //    }
+
     func deleteTrip(tripId: String, userId: String, userViewModel: UserViewModel) {
         db.collection("trips").document(tripId).delete { error in
             if let error = error {

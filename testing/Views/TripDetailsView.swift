@@ -48,6 +48,29 @@ struct TripDetailsView: View {
             // Trip details card
             VStack(alignment: .leading, spacing: 20) {
                 
+                if trip.isPrivate && trip.hostId == Auth.auth().currentUser?.uid {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("Invite Code")
+                                .font(.custom("BeVietnamPro-Regular", size: 14).weight(.medium))
+                                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                            Text(trip.inviteCode ?? "N/A")
+                                .font(.custom("BeVietnamPro-Regular", size: 18).weight(.bold))
+                                .foregroundColor(Color(red: 0.07, green: 0.36, blue: 0.22))
+                        }
+                        Spacer()
+                        Button(action: {
+                            UIPasteboard.general.string = trip.inviteCode
+                        }) {
+                            Image(systemName: "doc.on.doc")
+                                .foregroundColor(Color(red: 0.07, green: 0.36, blue: 0.22))
+                        }
+                    }
+                    .padding()
+                    .background(Color(red: 0.94, green: 0.96, blue: 0.95))
+                    .cornerRadius(8)
+                }
+                
                 HStack {
                     
                     Text("\(trip.from) → \(trip.to)")
@@ -308,26 +331,3 @@ struct DetailRow: View {
         .frame(height: 37)
     }
 }
-
-//struct TripDetailsView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        let mockTrip = TripInfo(
-//            id: "mockId",
-//            hostId: "mockHostId",
-//            from: "Evans Hall",
-//            to: "SFO, Terminal Two",
-//            date: Date(),
-//            joinedUsers: [],
-//            totalSpots: 4,
-//            distance: "0.2 Miles from your current location",
-//            price: "$6.33"
-//        )
-//
-//        let mockUserViewModel = UserViewModel()
-//        let mockTripViewModel = TripViewModel()
-//
-//        return TripDetailsView(isFromActiveTrips: true, trip: mockTrip)
-//            .environmentObject(mockUserViewModel)
-//            .environmentObject(mockTripViewModel)
-//    }
-//}

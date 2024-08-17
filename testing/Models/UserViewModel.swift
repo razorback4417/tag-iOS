@@ -19,8 +19,8 @@ struct User: Codable, Identifiable {
     let school: String
     let major: String
     let interests: [String]
-    var createdTrips: [String] = []  // Array of trip IDs created by the user
-    var joinedTrips: [String] = []   // Array of trip IDs joined by the user
+    var createdTrips: [String] = []
+    var joinedTrips: [String] = []
 }
 class UserViewModel: ObservableObject {
     @Published var user: User?
@@ -173,7 +173,6 @@ class UserViewModel: ObservableObject {
             }
         }
     }
-    //    RYNfFRXhsfYPfKlIhpYXWI286TM2
     
     func updateUserData(userData: User) {
         guard let userId = Auth.auth().currentUser?.uid else { return }

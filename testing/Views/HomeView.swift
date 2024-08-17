@@ -10,6 +10,7 @@ struct HomeView: View {
     @State private var searchText = ""
     @Binding var showCreateView: Bool
     @State private var showComingSoon = false
+    @State private var showInviteCodeView = false  // New state variable
     var onFindRidesTapped: () -> Void
     
     let imageURLFind = URL(string: "https://images.pexels.com/photos/6268943/pexels-photo-6268943.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")!
@@ -42,7 +43,7 @@ struct HomeView: View {
                 ])
                 
                 // Join a Friend
-                Button(action: { showComingSoon = true }) {
+                Button(action: { showInviteCodeView = true }) {
                     JoinFriendView(imageURL: imageURLFriend)
                 }
             }
@@ -51,6 +52,9 @@ struct HomeView: View {
         .navigationBarHidden(true)
         .sheet(isPresented: $showComingSoon) {
             ComingSoonView()
+        }
+        .sheet(isPresented: $showInviteCodeView) {
+            InviteCodeView()
         }
     }
 }
@@ -72,8 +76,6 @@ struct SearchBar: View {
 struct RecentPlacesView: View {
     let recentPlaces = [
         ("Evans Hall", "Berkeley, California"),
-//        ("SFO Airport, Terminal One", "San Francisco, California"),
-//        ("Embarcadero Station", "San Francisco, California")
     ]
     
     var body: some View {
@@ -143,11 +145,11 @@ struct SectionView: View {
                             Text(item.description)
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
-                                .lineLimit(2)  // Limit to 2 lines to ensure consistent height
+                                .lineLimit(2)
                         }
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .frame(maxWidth: .infinity)  // This ensures equal width for both items
+                    .frame(maxWidth: .infinity)
                 }
             }
         }

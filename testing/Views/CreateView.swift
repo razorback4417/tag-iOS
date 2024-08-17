@@ -26,13 +26,13 @@ struct CreateView: View {
     @State private var showAlert = false
     @State private var alertMessage = ""
     @State private var tripInfo: TripInfo?
+    @State private var inviteCode: String?
     
     var onViewMyTrip: () -> Void
     
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Progress indicator (only shown for steps 1-4)
                 if currentStep < 5 {
                     HStack(spacing: 10) {
                         ForEach(1...5, id: \.self) { step in
@@ -51,7 +51,7 @@ struct CreateView: View {
                 Group {
                     switch currentStep {
                     case 1:
-                        Step1View(currentStep: $currentStep, selection: $selection)
+                        Step1View(currentStep: $currentStep, selection: $selection, inviteCode: $inviteCode)
                     case 2:
                         Step2View(currentStep: $currentStep, pickupLocation: $pickupLocation, destination: $destination)
                     case 3:
@@ -119,19 +119,21 @@ struct CreateView: View {
             }
             
             return TripInfo(
-                id: nil,  // Firebase will generate this
+                id: nil,
                 hostId: userId,
                 from: pickupLocation,
                 to: destination,
                 date: combinedDateTime,
-                joinedUsers: [userId],  // include host
-                totalSpots: 4,  // update to be able to support "party" size
-                distance: 0, // This will be calculated in the TripViewModel
+                joinedUsers: [userId], //includes host
+                totalSpots: 4,
+                distance: 0,
                 price: "N/A",
                 fromLatitude: fromCoord.latitude,
                 fromLongitude: fromCoord.longitude,
                 toLatitude: toCoord.latitude,
-                toLongitude: toCoord.longitude
+                toLongitude: toCoord.longitude,
+                isPrivate: selection == "Friends",
+                inviteCode: inviteCode
             )
         } catch {
             throw NSError(domain: "CreateView", code: 2, userInfo: [NSLocalizedDescriptionKey: "Error geocoding addresses: \(error.localizedDescription)"])
@@ -141,6 +143,7 @@ struct CreateView: View {
 struct Step1View: View {
     @Binding var currentStep: Int
     @Binding var selection: String?
+    @Binding var inviteCode: String?
     @EnvironmentObject private var userViewModel: UserViewModel
     
     var body: some View {
@@ -164,7 +167,10 @@ struct Step1View: View {
             VStack(spacing: 10) {
                 SelectionButton(title: "Just me", subtitle: "Find other verified students to share the ride with", isSelected: selection == "Just me", action: { selection = "Just me" })
                 
-                SelectionButton(title: "Friends", subtitle: "Create a private trip with an invite code to send out", isSelected: selection == "Friends", action: { selection = "Friends" })
+                SelectionButton(title: "Friends", subtitle: "Create a private trip with an invite code to send out", isSelected: selection == "Friends", action: {
+                    selection = "Friends"
+                    inviteCode = generateInviteCode()
+                })
             }
             .padding(.horizontal, 24)
             
@@ -184,6 +190,10 @@ struct Step1View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 20)
         }
+    }
+    private func generateInviteCode() -> String {
+        let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<6).map{ _ in letters.randomElement()! })
     }
 }
 
@@ -332,10 +342,8 @@ struct Step2View: View {
                 Spacer().frame(height: 210)
                 if showingPickupResults && !placeViewModel.places.isEmpty {
                     predictionsListView(for: .pickup)
-                    //                        .offset(y: 145)
                 } else if showingDestinationResults && !placeViewModel.places.isEmpty {
                     predictionsListView(for: .destination)
-                    //                        .offset(y: 205) // Adjust this value to position the list correctly
                 }
                 Spacer()
             }
@@ -650,13 +658,5 @@ struct Step5View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 20)
         }
-    }
-}
-
-struct CreateView_Previews: PreviewProvider {
-    static var previews: some View {
-        CreateView(isPresented: .constant(true), onViewMyTrip: {})
-            .environmentObject(UserViewModel())
-            .environmentObject(TripViewModel())
     }
 }

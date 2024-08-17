@@ -22,6 +22,8 @@ struct TripInfo: Identifiable, Codable {
     let fromLongitude: Double
     let toLatitude: Double
     let toLongitude: Double
+    let isPrivate: Bool
+    let inviteCode: String?
     
     var availableSpots: Int {
         return totalSpots - joinedUsers.count
