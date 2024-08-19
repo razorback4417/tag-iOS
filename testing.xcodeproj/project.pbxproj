@@ -426,6 +426,7 @@
 			packageReferences = (
 				54172D7B2C4C45F000198E7D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				5472DE582C5EA987000FC4B5 /* XCRemoteSwiftPackageReference "ios-places-sdk" */,
+				5484B42D2C73199700CDF4E9 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */,
 			);
 			productRefGroup = 54B78FED2C2E242000CEEFED /* Products */;
 			projectDirPath = "";
@@ -868,6 +869,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 9.0.0;
+			};
+		};
+		5484B42D2C73199700CDF4E9 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mapbox/mapbox-maps-ios.git";
+			requirement = {
+				branch = main;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

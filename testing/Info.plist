@@ -4,6 +4,8 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>MBXAccessToken</key>
+	<string>pk.eyJ1IjoibHV1dCIsImEiOiJjbHp5bXVteTgxNWVtMmtwd2sybWtobDY2In0.UfIWbluPoRI54LdL3VMW7g</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>BeVietnamPro-Regular.ttf</string>

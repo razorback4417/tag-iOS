@@ -1,5 +1,5 @@
 {
-  "originHash" : "5fb78eb901643b9532aa074dc2a1ea416d1538dc1f2333e896e07604bd12656a",
+  "originHash" : "dff4de09efb44c8ef834faf06ded2cbb972ac5e03278b777e9279281d03b9f91",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -101,6 +101,33 @@
       }
     },
     {
+      "identity" : "mapbox-common-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-common-ios.git",
+      "state" : {
+        "revision" : "b4197f12f928066645e08b70c12ce1e22e50e2c3",
+        "version" : "24.6.0"
+      }
+    },
+    {
+      "identity" : "mapbox-core-maps-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-core-maps-ios.git",
+      "state" : {
+        "revision" : "455ad90488ab033a50ab4b7283fa78184309eef3",
+        "version" : "11.6.0"
+      }
+    },
+    {
+      "identity" : "mapbox-maps-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-maps-ios.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "4eb4d65d3124447e95c5e665a6f2f860083cc20d"
+      }
+    },
+    {
       "identity" : "nanopb",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/nanopb.git",
@@ -125,6 +152,15 @@
       "state" : {
         "revision" : "d57a5aecf24a25b32ec4a74be2f5d0a995a47c4b",
         "version" : "1.27.0"
+      }
+    },
+    {
+      "identity" : "turf-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/turf-swift.git",
+      "state" : {
+        "revision" : "213050191cfcb3d5aa76e1fa90c6ff1e182a42ca",
+        "version" : "2.8.0"
       }
     }
   ],
