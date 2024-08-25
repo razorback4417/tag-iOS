@@ -7,3 +7,9 @@ Tag allows you to find other students going to the same place at the same time. 
 3) discounts/rewards to local resturants for using the app
 
 Tag is set to launch Fall 2024 at UCLA.
+
+Coming Soon:
+- mapbox implementation
+- message groupchats with stream
+- verification
+- simplify registration
