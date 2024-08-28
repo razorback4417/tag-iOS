@@ -16,8 +16,8 @@ struct TripInfo: Identifiable, Codable {
     let date: Date
     var joinedUsers: [String]
     let totalSpots: Int
-    var distance: Double
-    let price: String
+    var distance: Double //dont worry about
+    let price: String //dont worry about
     let fromLatitude: Double
     let fromLongitude: Double
     let toLatitude: Double

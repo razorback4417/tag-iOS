@@ -10,42 +10,30 @@ import FirebaseFirestore
 
 struct User: Codable, Identifiable {
     @DocumentID var id: String?
-    let firstName: String
-    let lastName: String
+    let name: String
     let email: String
-    let username: String
-    let phoneNumber: String
-    let gender: String
     let school: String
-    let major: String
-    let interests: [String]
     var createdTrips: [String] = []
     var joinedTrips: [String] = []
 }
+
 class UserViewModel: ObservableObject {
     @Published var user: User?
     @Published var isLoggedIn = false
-    @Published var registrationData: RegistrationData?
+    @Published var userTrips: (created: [TripInfo], joined: [TripInfo]) = ([], [])
+    
     private var db = Firestore.firestore()
     
-    @Published var userTrips: (created: [TripInfo], joined: [TripInfo]) = ([], [])
+    enum School: String, CaseIterable, Identifiable {
+        case ucla = "UCLA"
+        case usc = "USC"
+        case smcc = "Santa Monica City College"
+        
+        var id: String { self.rawValue }
+    }
     
     init() {
         checkUserStatus()
-    }
-    
-    func refreshUserTrips() {
-        fetchUserTrips { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let trips):
-                    self?.userTrips = trips
-                    self?.objectWillChange.send()
-                case .failure(let error):
-                    print("Failed to refresh user trips: \(error.localizedDescription)")
-                }
-            }
-        }
     }
     
     func checkUserStatus() {
@@ -55,22 +43,6 @@ class UserViewModel: ObservableObject {
         } else {
             self.isLoggedIn = false
             self.user = nil
-        }
-    }
-    
-    func signIn(email: String, password: String) {
-        Auth.auth().signIn(withEmail: email, password: password) { [weak self] result, error in
-            guard let self = self else { return }
-            
-            if let error = error {
-                print("Error signing in: \(error.localizedDescription)")
-                return
-            }
-            
-            self.isLoggedIn = true
-            if let userId = result?.user.uid {
-                self.fetchUserData(userId: userId)
-            }
         }
     }
     
@@ -98,73 +70,47 @@ class UserViewModel: ObservableObject {
         }
     }
     
-    func startRegistration(step1Data: RegistrationStep1Data) {
-        registrationData = RegistrationData(step1: step1Data)
-    }
-    
-    func continueRegistration(step2Data: RegistrationStep2Data) {
-        registrationData?.step2 = step2Data
-    }
-    
-    func finishRegistration() {
-        
-        guard let registrationData = registrationData,
-              let step1 = registrationData.step1,
-              let step2 = registrationData.step2 else {
-            print("Registration data is incomplete")
-            return
-        }
-        
-        let userData = User(
-            firstName: step1.name,
-            lastName: step1.surname,
-            email: step1.email,
-            username: step1.username,
-            phoneNumber: step1.phone,
-            gender: step2.gender,
-            school: step2.school,
-            major: step2.major,
-            interests: step2.interests.components(separatedBy: ",")
-        )
-        
-        Auth.auth().createUser(withEmail: step1.email, password: step1.password) { [weak self] result, error in
-            guard let self = self else { return }
-            
+    func register(name: String, email: String, school: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        Auth.auth().createUser(withEmail: email, password: password) { [weak self] result, error in
             if let error = error {
-                print("Error signing up: \(error.localizedDescription)")
+                completion(.failure(error))
                 return
             }
             
-            guard let userId = result?.user.uid else { return }
+            guard let userId = result?.user.uid else {
+                completion(.failure(NSError(domain: "Registration", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to get user ID"])))
+                return
+            }
             
-            self.saveUserData(userId: userId, userData: userData)
+            let userData = User(name: name, email: email, school: school)
+            self?.saveUserData(userId: userId, userData: userData) { result in
+                switch result {
+                case .success:
+                    self?.isLoggedIn = true
+                    self?.user = userData
+                    completion(.success(()))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
         }
     }
     
-    func saveUserData(userId: String, userData: User) {
+    private func saveUserData(userId: String, userData: User, completion: @escaping (Result<Void, Error>) -> Void) {
         do {
-            try db.collection("users").document(userId).setData(from: userData, merge: true)
-            self.user = userData
-            self.isLoggedIn = true
+            try db.collection("users").document(userId).setData(from: userData)
+            completion(.success(()))
         } catch {
-            print("Error saving user data: \(error.localizedDescription)")
+            completion(.failure(error))
         }
     }
     
     private func fetchUserData(userId: String) {
-        print("here inside fetch")
         db.collection("users").document(userId).getDocument { [weak self] document, error in
-            guard let self = self else { return }
-            
-            if let error = error {
-                print("Error fetching user data: \(error.localizedDescription)")
-                return
-            }
-            
             if let document = document, document.exists {
                 do {
-                    self.user = try document.data(as: User.self)
-                    print("Fetched user data: \(String(describing: self.user))")
+                    self?.user = try document.data(as: User.self)
+                    self?.refreshUserTrips()
                 } catch {
                     print("Error decoding user data: \(error.localizedDescription)")
                 }
@@ -174,20 +120,21 @@ class UserViewModel: ObservableObject {
         }
     }
     
-    func updateUserData(userData: User) {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-        
-        do {
-            try db.collection("users").document(userId).setData(from: userData, merge: true)
-            self.user = userData
-        } catch {
-            print("Error updating user data: \(error.localizedDescription)")
+    func refreshUserTrips() {
+        fetchUserTrips { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let trips):
+                    self?.userTrips = trips
+                    self?.objectWillChange.send()
+                case .failure(let error):
+                    print("Failed to refresh user trips: \(error.localizedDescription)")
+                }
+            }
         }
     }
     
-    
     func fetchUserTrips(completion: @escaping (Result<(created: [TripInfo], joined: [TripInfo]), Error>) -> Void) {
-        print("fetching user trips")
         guard let user = self.user, let userId = user.id else {
             completion(.failure(NSError(domain: "UserViewModel", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not logged in or user data not available"])))
             return
@@ -256,15 +203,12 @@ class UserViewModel: ObservableObject {
             }
         }
     }
-}
-
-extension UserViewModel {
+    
     func fetchUserName(userId: String, completion: @escaping (String) -> Void) {
         db.collection("users").document(userId).getDocument { document, error in
             if let document = document, document.exists {
-                let firstName = document.get("firstName") as? String ?? ""
-                let lastName = document.get("lastName") as? String ?? ""
-                completion("\(firstName) \(lastName)")
+                let name = document.get("name") as? String ?? "Unknown User"
+                completion(name)
             } else {
                 completion("Unknown User")
             }
@@ -314,9 +258,7 @@ extension UserViewModel {
             }
         }
     }
-}
-
-extension UserViewModel {
+    
     func fetchUserProfile(userId: String, completion: @escaping (Result<User, Error>) -> Void) {
         db.collection("users").document(userId).getDocument { document, error in
             if let error = error {
@@ -333,25 +275,4 @@ extension UserViewModel {
             }
         }
     }
-}
-
-struct RegistrationData {
-    var step1: RegistrationStep1Data?
-    var step2: RegistrationStep2Data?
-}
-
-struct RegistrationStep1Data {
-    let name: String
-    let surname: String
-    let email: String
-    let username: String
-    let phone: String
-    let password: String
-}
-
-struct RegistrationStep2Data {
-    let gender: String
-    let major: String
-    let school: String
-    let interests: String
 }

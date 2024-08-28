@@ -42,11 +42,8 @@ struct AccountInformationView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("\(userViewModel.user?.firstName ?? "") \(userViewModel.user?.lastName ?? "")")
+                            Text("\(userViewModel.user?.name ?? "") ")
                                 .font(.system(size: 18, weight: .bold))
-                            Text(userViewModel.user?.gender ?? "")
-                                .font(.system(size: 12))
-                                .foregroundColor(.gray)
                             HStack {
                                 Image(systemName: "calendar")
                                 Text("Join Date: 7/10/2024")
@@ -59,30 +56,30 @@ struct AccountInformationView: View {
                     
                     Divider()
                     
-                    Text("General Info")
-                        .font(.system(size: 18, weight: .bold))
-                    
-                    ForEach([
-                        "School: \(userViewModel.user?.school ?? "")",
-                        "Major: \(userViewModel.user?.major ?? "")",
-                        "Phone: \(userViewModel.user?.phoneNumber ?? "")",
-                        "Interests: \(userViewModel.user?.interests.joined(separator: ", ") ?? "")"
-                    ], id: \.self) { item in
-                        HStack {
-                            Image(systemName: item.hasPrefix("School") ? "building.columns" :
-                                    (item.hasPrefix("Major") ? "book" :
-                                        (item.hasPrefix("Phone") ? "phone.fill" : "star")))
-                            .foregroundColor(.white)
-                            .frame(width: 30, height: 30)
-                            .background(darkGreenColor)
-                            .clipShape(Circle())
-                            Text(item)
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(.gray)
-                        }
-                        .padding(.vertical, 8)
-                    }
+//                    Text("General Info")
+//                        .font(.system(size: 18, weight: .bold))
+//                    
+//                    ForEach([
+//                        "School: \(userViewModel.user?.school ?? "")",
+//                        "Major: \(userViewModel.user?.major ?? "")",
+//                        "Phone: \(userViewModel.user?.phoneNumber ?? "")",
+//                        "Interests: \(userViewModel.user?.interests.joined(separator: ", ") ?? "")"
+//                    ], id: \.self) { item in
+//                        HStack {
+//                            Image(systemName: item.hasPrefix("School") ? "building.columns" :
+//                                    (item.hasPrefix("Major") ? "book" :
+//                                        (item.hasPrefix("Phone") ? "phone.fill" : "star")))
+//                            .foregroundColor(.white)
+//                            .frame(width: 30, height: 30)
+//                            .background(darkGreenColor)
+//                            .clipShape(Circle())
+//                            Text(item)
+//                            Spacer()
+//                            Image(systemName: "chevron.right")
+//                                .foregroundColor(.gray)
+//                        }
+//                        .padding(.vertical, 8)
+//                    }
                 }
                 .padding()
                 .onAppear {
@@ -101,12 +98,12 @@ struct AccountInformationView: View {
     }
 }
 
-struct Account_Preview: PreviewProvider {
-    static var previews: some View {
-        let mockViewModel = UserViewModel()
-        mockViewModel.user = User(id: "1", firstName: "John", lastName: "Doe", email: "john@example.com", username: "johndoe", phoneNumber: "1234567890", gender: "Male", school: "UCLA", major: "Computer Science", interests: ["Coding", "Music"])
-        
-        return AccountInformationView()
-            .environmentObject(mockViewModel)
-    }
-}
+//struct Account_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let mockViewModel = UserViewModel()
+//        mockViewModel.user = User(id: "1", firstName: "John", lastName: "Doe", email: "john@example.com", username: "johndoe", phoneNumber: "1234567890", gender: "Male", school: "UCLA", major: "Computer Science", interests: ["Coding", "Music"])
+//        
+//        return AccountInformationView()
+//            .environmentObject(mockViewModel)
+//    }
+//}

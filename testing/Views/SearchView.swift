@@ -120,7 +120,7 @@ struct SearchView: View {
                 }
             }
             VStack(alignment: .leading, spacing: 4) {
-                Text("Hello \(userViewModel.user?.firstName ?? "there") 👋")
+                Text("Hello \(userViewModel.user?.name ?? "there") 👋")
                     .font(.custom("Be Vietnam Pro", size: 12))
                     .foregroundColor(.black)
                 
